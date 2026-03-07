@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>칼로리 계산기 — CalcZip</title>
+  <meta name="description" content="하루 권장 칼로리와 목표 체중에 필요한 칼로리를 계산해보세요. BMR·TDEE 기반." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-light: #eff4ff; --accent-dark: #1d4ed8; --green: #16a34a; --orange: #ea580c; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .back-btn { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .back-btn:hover { color: var(--text); }
+    main { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -0.8px; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--text-muted); font-weight: 300; margin-bottom: 36px; }
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 620px) { .layout { grid-template-columns: 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+    .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    .input-wrap { position: relative; }
+    input[type="number"] { width: 100%; padding: 10px 52px 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); background: #fafaf8; outline: none; -moz-appearance: textfield; transition: border-color 0.15s, box-shadow 0.15s; }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--surface); }
+    .input-unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); pointer-events: none; }
+    select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--text); background: #fafaf8; cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.15s; }
+    select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .gender-row { display: flex; gap: 8px; }
+    .gender-btn { flex: 1; padding: 9px 0; border: 1px solid var(--border); border-radius: 8px; background: #fafaf8; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .gender-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .calc-btn { width: 100%; margin-top: 24px; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .calc-btn:hover { background: var(--accent-dark); }
+    .calc-btn:active { transform: scale(0.98); }
+    .result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .result-card.show { display: block; }
+    .result-hero { background: var(--accent); padding: 28px; color: #fff; text-align: center; }
+    .result-hero-label { font-size: 12px; opacity: 0.75; margin-bottom: 8px; font-weight: 300; }
+    .result-hero-amount { font-family: 'DM Mono', monospace; font-size: clamp(32px, 6vw, 48px); font-weight: 500; letter-spacing: -1px; margin-bottom: 4px; }
+    .result-hero-sub { font-size: 12px; opacity: 0.7; font-weight: 300; }
+    .result-body { padding: 24px 28px; }
+    .goal-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .goal-box { border-radius: 10px; padding: 14px 12px; text-align: center; border: 1px solid var(--border); }
+    .goal-box .g-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 300; }
+    .goal-box .g-value { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 700; }
+    .goal-box.lose { background: #fef2f2; border-color: #fecaca; }
+    .goal-box.lose .g-value { color: #dc2626; }
+    .goal-box.maintain { background: var(--accent-light); border-color: #bfdbfe; }
+    .goal-box.maintain .g-value { color: var(--accent); }
+    .goal-box.gain { background: #f0fdf4; border-color: #bbf7d0; }
+    .goal-box.gain .g-value { color: var(--green); }
+    .result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .r-label { color: var(--text-muted); font-weight: 300; }
+    .result-row .r-value { font-family: 'DM Mono', monospace; font-weight: 500; }
+    .info-box { margin-top: 16px; padding: 14px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 12px; color: #92400e; font-weight: 300; line-height: 1.6; }
+    .share-row { display: flex; gap: 8px; margin-top: 16px; }
+    .share-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: background 0.15s; color: var(--text-muted); }
+    .share-btn:hover { background: var(--bg); color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">calc<span>zip</span>.kr</a>
+      <a href="/" class="back-btn">← 전체 계산기</a>
+    </div>
+  </header>
+  <main>
+    <p class="page-label">Life · Health</p>
+    <h1>칼로리 계산기</h1>
+    <p class="page-sub">하루 권장 칼로리 · 다이어트·유지·벌크업 목표별 칼로리</p>
+    <div class="layout">
+      <div class="card">
+        <div class="card-title">입력</div>
+        <div class="field">
+          <label>성별</label>
+          <div class="gender-row">
+            <button class="gender-btn active" id="btn-male" onclick="setGender('male')">남성</button>
+            <button class="gender-btn" id="btn-female" onclick="setGender('female')">여성</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>나이</label>
+          <div class="input-wrap">
+            <input type="number" id="age" placeholder="예: 30" />
+            <span class="input-unit">세</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>키</label>
+          <div class="input-wrap">
+            <input type="number" id="height" placeholder="예: 170" />
+            <span class="input-unit">cm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>몸무게</label>
+          <div class="input-wrap">
+            <input type="number" id="weight" placeholder="예: 65" />
+            <span class="input-unit">kg</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>활동 수준</label>
+          <select id="activity">
+            <option value="1.2">거의 운동 안 함 (사무직)</option>
+            <option value="1.375">가벼운 운동 (주 1~3회)</option>
+            <option value="1.55" selected>보통 운동 (주 3~5회)</option>
+            <option value="1.725">강한 운동 (주 6~7회)</option>
+            <option value="1.9">매우 강한 운동 (하루 2회)</option>
+          </select>
+        </div>
+        <button class="calc-btn" onclick="calculate()">칼로리 계산하기</button>
+      </div>
+      <div id="result-card" class="result-card">
+        <div class="result-hero">
+          <div class="result-hero-label">하루 유지 칼로리 (TDEE)</div>
+          <div class="result-hero-amount" id="r-tdee">—</div>
+          <div class="result-hero-sub" id="r-bmr-sub">기초대사량(BMR) —</div>
+        </div>
+        <div class="result-body">
+          <div class="goal-grid">
+            <div class="goal-box lose">
+              <div class="g-label">다이어트</div>
+              <div class="g-value" id="r-lose">—</div>
+            </div>
+            <div class="goal-box maintain">
+              <div class="g-label">유지</div>
+              <div class="g-value" id="r-maintain">—</div>
+            </div>
+            <div class="goal-box gain">
+              <div class="g-label">벌크업</div>
+              <div class="g-value" id="r-gain">—</div>
+            </div>
+          </div>
+          <div class="result-row">
+            <span class="r-label">기초대사량 (BMR)</span>
+            <span class="r-value" id="r-bmr">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">단백질 권장량</span>
+            <span class="r-value" id="r-protein">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">탄수화물 권장량</span>
+            <span class="r-value" id="r-carb">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">지방 권장량</span>
+            <span class="r-value" id="r-fat">—</span>
+          </div>
+          <div class="info-box">
+            ⚠️ 본 계산은 Mifflin-St Jeor 공식 기반 추정치예요. 개인의 건강 상태에 따라 실제 권장량은 다를 수 있어요.
+          </div>
+          <div class="share-row">
+            <button class="share-btn" onclick="resetAll()">↺ 다시 계산</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    let gender = 'male';
+    function setGender(g) {
+      gender = g;
+      document.getElementById('btn-male').classList.toggle('active', g === 'male');
+      document.getElementById('btn-female').classList.toggle('active', g === 'female');
+    }
+    function calculate() {
+      const age = parseFloat(document.getElementById('age').value);
+      const h = parseFloat(document.getElementById('height').value);
+      const w = parseFloat(document.getElementById('weight').value);
+      const activity = parseFloat(document.getElementById('activity').value);
+      if (!age || !h || !w) { alert('모든 항목을 입력해주세요.'); return; }
+      // Mifflin-St Jeor
+      let bmr = gender === 'male'
+        ? 10 * w + 6.25 * h - 5 * age + 5
+        : 10 * w + 6.25 * h - 5 * age - 161;
+      const tdee = bmr * activity;
+      const lose = Math.round(tdee * 0.8);
+      const maintain = Math.round(tdee);
+      const gain = Math.round(tdee * 1.15);
+      // 영양소 (유지 기준)
+      const protein = Math.round(w * 1.6); // g
+      const fat = Math.round(tdee * 0.25 / 9); // g
+      const carb = Math.round((tdee - protein * 4 - fat * 9) / 4); // g
+      document.getElementById('r-tdee').textContent = Math.round(tdee).toLocaleString() + ' kcal';
+      document.getElementById('r-bmr-sub').textContent = '기초대사량(BMR) ' + Math.round(bmr).toLocaleString() + ' kcal';
+      document.getElementById('r-bmr').textContent = Math.round(bmr).toLocaleString() + ' kcal';
+      document.getElementById('r-lose').textContent = lose.toLocaleString() + ' kcal';
+      document.getElementById('r-maintain').textContent = maintain.toLocaleString() + ' kcal';
+      document.getElementById('r-gain').textContent = gain.toLocaleString() + ' kcal';
+      document.getElementById('r-protein').textContent = protein + 'g';
+      document.getElementById('r-carb').textContent = carb + 'g';
+      document.getElementById('r-fat').textContent = fat + 'g';
+      document.getElementById('result-card').classList.add('show');
+      setTimeout(() => document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+    function resetAll() {
+      ['age','height','weight'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('result-card').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

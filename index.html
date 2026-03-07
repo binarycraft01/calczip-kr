@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CalcZip — 똑똑한 계산기 모음</title>
-  <meta name="description" content="연봉, 퇴직금, 실업급여, 대출, 날짜 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
+  <meta name="description" content="연봉, 퇴직금, 실업급여, 대출, 칼로리 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -31,8 +31,6 @@
     .card-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
     .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; font-weight: 300; flex: 1; }
     .card-tag { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 4px; background: var(--tag-bg); color: var(--text-muted); font-family: 'DM Mono', monospace; }
-    .card.soon { opacity: 0.5; pointer-events: none; cursor: default; }
-    .card.soon .card-icon { background: #f0ede6; }
     footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 300; line-height: 1.8; }
     footer span { font-family: 'DM Mono', monospace; }
     @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
@@ -48,11 +46,12 @@
   <section class="hero">
     <p class="hero-label">All Calculators</p>
     <h1>필요한 계산,<br>여기서 바로.</h1>
-    <p>연봉, 퇴직금, 실업급여, 대출, 날짜 계산까지 — 복잡한 계산을 쉽고 빠르게.</p>
+    <p>연봉, 퇴직금, 실업급여, 대출, 칼로리 계산까지 — 복잡한 계산을 쉽고 빠르게.</p>
   </section>
   <div class="filter-row">
     <button class="filter-btn active" onclick="filterCards('all', this)">전체</button>
     <button class="filter-btn" onclick="filterCards('finance', this)">금융·급여</button>
+    <button class="filter-btn" onclick="filterCards('tax', this)">세금</button>
     <button class="filter-btn" onclick="filterCards('loan', this)">대출</button>
     <button class="filter-btn" onclick="filterCards('life', this)">생활</button>
   </div>
@@ -81,10 +80,22 @@
       <div class="card-desc">2024년 최저시급 기준 일급, 주급, 월급을 계산해요. 주휴수당 포함.</div>
       <span class="card-tag">finance</span>
     </a>
+    <a href="/income-tax/" class="card" data-cat="tax">
+      <div class="card-icon">📊</div>
+      <div class="card-title">종합소득세 계산기</div>
+      <div class="card-desc">프리랜서·사업자를 위한 종합소득세 간편 계산기예요.</div>
+      <span class="card-tag">tax</span>
+    </a>
     <a href="/loan/" class="card" data-cat="loan">
       <div class="card-icon">🏠</div>
       <div class="card-title">주택담보대출 계산기</div>
       <div class="card-desc">원리금균등 / 원금균등 방식으로 월 상환금과 총이자를 계산해요.</div>
+      <span class="card-tag">loan</span>
+    </a>
+    <a href="/credit-loan/" class="card" data-cat="loan">
+      <div class="card-icon">💳</div>
+      <div class="card-title">신용대출 계산기</div>
+      <div class="card-desc">거치식·원리금균등 방식으로 월 이자와 총 상환액을 확인해요.</div>
       <span class="card-tag">loan</span>
     </a>
     <a href="/date/" class="card" data-cat="life">
@@ -99,18 +110,12 @@
       <div class="card-desc">키와 몸무게로 체질량지수(BMI)와 비만도를 확인해요.</div>
       <span class="card-tag">life</span>
     </a>
-    <div class="card soon" data-cat="finance">
-      <div class="card-icon">📊</div>
-      <div class="card-title">종합소득세 계산기</div>
-      <div class="card-desc">프리랜서·사업자를 위한 종합소득세 간편 계산기예요.</div>
-      <span class="card-tag">finance · 준비중</span>
-    </div>
-    <div class="card soon" data-cat="loan">
-      <div class="card-icon">💳</div>
-      <div class="card-title">신용대출 계산기</div>
-      <div class="card-desc">금리와 기간을 입력해 월 이자와 총 상환액을 확인해요.</div>
-      <span class="card-tag">loan · 준비중</span>
-    </div>
+    <a href="/calorie/" class="card" data-cat="life">
+      <div class="card-icon">🔥</div>
+      <div class="card-title">칼로리 계산기</div>
+      <div class="card-desc">하루 권장 칼로리와 다이어트·유지·벌크업별 목표 칼로리를 계산해요.</div>
+      <span class="card-tag">life</span>
+    </a>
   </div>
   <footer>
     <span>calczip.kr</span> &nbsp;·&nbsp; 생활에 필요한 계산기를 모아둔 곳<br>
