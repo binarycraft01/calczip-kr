@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>학점 계산기 — CalcZip</title><meta name="description" content="GPA 학점을 자동으로 계산하세요. 과목별 학점·성적 입력으로 평균 학점 계산."/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<style>
+<html lang="ko"><head>
+  <script src="/head.js"></script><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>학점 계산기 — CalcZip</title><meta name="description" content="GPA 학점을 자동으로 계산하세요. 과목별 학점·성적 입력으로 평균 학점 계산."/><style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
@@ -36,6 +34,21 @@ h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bo
 .rg-label{font-size:11px;opacity:.75;margin-bottom:4px}
 .rg-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:700}
 </style>
+  <!-- Open Graph / 카카오톡·디스코드 링크 미리보기 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="CalcZip" />
+  <meta property="og:title" content="학점 계산기 — CalcZip" />
+  <meta property="og:description" content="4.5·4.3·4.0 만점 기준 GPA를 과목별로 계산해요." />
+  <meta property="og:url" content="https://calczip.kr/gpa/" />
+  <meta property="og:image" content="https://calczip.kr/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="ko_KR" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="학점 계산기 — CalcZip" />
+  <meta name="twitter:description" content="4.5·4.3·4.0 만점 기준 GPA를 과목별로 계산해요." />
+  <meta name="twitter:image" content="https://calczip.kr/og-image.png" />
   <script src="/theme.js"></script>
   <script src="/footer.js"></script>
 </head>
