@@ -117,3 +117,13 @@ footer {
   font-weight: 300;
   opacity: 0.6;
 }
+
+/* 푸터 문의하기 링크 */
+.footer-copy a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.footer-copy a:hover {
+  text-decoration: underline;
+}
