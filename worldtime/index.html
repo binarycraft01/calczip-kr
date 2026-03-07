@@ -1,91 +1,166 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CalcZip — 똑똑한 계산기 모음</title>
-  <meta name="description" content="연봉, 퇴직금, 대출, 단위변환, 세계시간 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-light:#eff4ff;--tag-bg:#f0ede6}
-    body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
-    .header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
-    .logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:-.5px}
-    .logo span{color:var(--accent)}
-    .header-sub{font-size:12px;color:var(--text-muted);font-weight:300}
-    .hero{max-width:960px;margin:0 auto;padding:64px 24px 40px}
-    .hero-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:16px}
-    .hero h1{font-size:clamp(28px,5vw,42px);font-weight:700;line-height:1.25;letter-spacing:-1px;margin-bottom:12px}
-    .hero p{font-size:15px;color:var(--text-muted);font-weight:300;line-height:1.7}
-    .filter-row{max-width:960px;margin:0 auto 32px;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap}
-    .filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text-muted);cursor:pointer;transition:all .15s}
-    .filter-btn:hover,.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-    .grid{max-width:960px;margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,transform .15s,border-color .15s;position:relative;overflow:hidden}
-    .card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-2px);border-color:#ccc8be}
-    .card-icon{width:38px;height:38px;border-radius:9px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-    .card-title{font-size:14px;font-weight:700;letter-spacing:-.3px}
-    .card-desc{font-size:12px;color:var(--text-muted);line-height:1.6;font-weight:300;flex:1}
-    .card-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;background:var(--tag-bg);color:var(--text-muted);font-family:'DM Mono',monospace}
-    footer{border-top:1px solid var(--border);padding:24px;text-align:center;font-size:12px;color:var(--text-muted);font-weight:300;line-height:1.8}
-    footer span{font-family:'DM Mono',monospace}
-    @media(max-width:480px){.grid{grid-template-columns:1fr}}
-  </style>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>세계 시간 계산기 — CalcZip</title><meta name="description" content="전 세계 주요 도시의 현재 시간을 확인하고 시간대를 변환하세요."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:800px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+.city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:28px}
+.city-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.city-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.city-tz{font-size:11px;color:var(--text-muted);margin-bottom:8px}
+.city-time{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;letter-spacing:-0.5px}
+.city-date{font-size:11px;color:var(--text-muted);margin-top:2px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px}
+.card-title{font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:16px;text-transform:uppercase}
+.conv-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.conv-row input[type=datetime-local]{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--text);background:#fafaf8;outline:none;flex:1;min-width:180px}
+.conv-row input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.conv-row select{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:#fafaf8;outline:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--accent-dark)}
+.conv-result{background:var(--accent);border-radius:10px;padding:16px 20px;color:#fff;display:none}
+.conv-result.show{display:block}
+.conv-result .big{font-family:'DM Mono',monospace;font-size:22px;font-weight:500}
+.conv-result .small{font-size:12px;opacity:.75;margin-top:4px}
+</style>
 </head>
 <body>
-  <header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><span class="header-sub">생활 계산기 모음</span></div></header>
-  <section class="hero">
-    <p class="hero-label">All Calculators</p>
-    <h1>필요한 계산,<br>여기서 바로.</h1>
-    <p>연봉부터 단위변환, 세계시간까지 — 복잡한 계산을 쉽고 빠르게.</p>
-  </section>
-  <div class="filter-row">
-    <button class="filter-btn active" onclick="filterCards('all',this)">전체</button>
-    <button class="filter-btn" onclick="filterCards('finance',this)">금융·급여</button>
-    <button class="filter-btn" onclick="filterCards('tax',this)">세금·대출</button>
-    <button class="filter-btn" onclick="filterCards('life',this)">생활</button>
-    <button class="filter-btn" onclick="filterCards('util',this)">유틸리티</button>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Life · World Time</p>
+<h1>세계 시간</h1>
+<p class="page-sub">전 세계 주요 도시 현재 시간 · 시간대 변환</p>
+
+<div class="city-grid" id="city-grid"></div>
+
+<div class="card">
+  <div class="card-title">시간대 변환</div>
+  <div class="conv-row">
+    <input type="datetime-local" id="conv-dt"/>
+    <select id="conv-from"></select>
+    <span style="color:var(--text-muted)">→</span>
+    <select id="conv-to"></select>
+    <button class="btn" onclick="convertTZ()">변환</button>
   </div>
-  <div class="grid" id="card-grid">
-    <a href="/salary/" class="card" data-cat="finance"><div class="card-icon">💰</div><div class="card-title">연봉 실수령액 계산기</div><div class="card-desc">4대보험·소득세 공제 후 실제 월 수령액을 계산해요.</div><span class="card-tag">finance</span></a>
-    <a href="/retirement/" class="card" data-cat="finance"><div class="card-icon">📈</div><div class="card-title">퇴직금 계산기</div><div class="card-desc">근속 기간과 평균 임금으로 퇴직금을 자동 계산해요.</div><span class="card-tag">finance</span></a>
-    <a href="/unemployment/" class="card" data-cat="finance"><div class="card-icon">🛡️</div><div class="card-title">실업급여 계산기</div><div class="card-desc">구직급여 예상 수령액과 수급 기간을 계산해요.</div><span class="card-tag">finance</span></a>
-    <a href="/minwage/" class="card" data-cat="finance"><div class="card-icon">⏱️</div><div class="card-title">최저시급 계산기</div><div class="card-desc">2024년 최저시급 기준 일급·주급·월급. 주휴수당 포함.</div><span class="card-tag">finance</span></a>
-    <a href="/savings/" class="card" data-cat="finance"><div class="card-icon">🏦</div><div class="card-title">예적금 이자 계산기</div><div class="card-desc">예금·적금 만기 이자와 세후 수령액을 계산해요. 단리·복리.</div><span class="card-tag">finance</span></a>
-    <a href="/income-tax/" class="card" data-cat="tax"><div class="card-icon">📊</div><div class="card-title">종합소득세 계산기</div><div class="card-desc">프리랜서·사업자를 위한 종합소득세 간편 계산기예요.</div><span class="card-tag">tax</span></a>
-    <a href="/vat/" class="card" data-cat="tax"><div class="card-icon">🧾</div><div class="card-title">부가세 계산기</div><div class="card-desc">VAT 10% 기준 공급가액 ↔ 부가세 포함가 계산.</div><span class="card-tag">tax</span></a>
-    <a href="/loan/" class="card" data-cat="tax"><div class="card-icon">🏠</div><div class="card-title">주택담보대출 계산기</div><div class="card-desc">원리금균등·원금균등 방식 월 상환금·총이자·스케줄.</div><span class="card-tag">loan</span></a>
-    <a href="/credit-loan/" class="card" data-cat="tax"><div class="card-icon">💳</div><div class="card-title">신용대출 계산기</div><div class="card-desc">거치식·원리금균등 방식 월 이자와 총 상환액.</div><span class="card-tag">loan</span></a>
-    <a href="/date/" class="card" data-cat="life"><div class="card-icon">📅</div><div class="card-title">날짜·D-Day 계산기</div><div class="card-desc">날짜 간격·D-Day·만 나이를 한 곳에서 계산해요.</div><span class="card-tag">life</span></a>
-    <a href="/lunar/" class="card" data-cat="life"><div class="card-icon">🌙</div><div class="card-title">음력 양력 변환</div><div class="card-desc">양력 ↔ 음력 변환. 간지년·윤달 확인.</div><span class="card-tag">life</span></a>
-    <a href="/worldtime/" class="card" data-cat="life"><div class="card-icon">🌍</div><div class="card-title">세계 시간</div><div class="card-desc">전 세계 주요 도시 현재 시간·시간대 변환.</div><span class="card-tag">life</span></a>
-    <a href="/ovulation/" class="card" data-cat="life"><div class="card-icon">🌸</div><div class="card-title">배란일 계산기</div><div class="card-desc">생리 주기 기반 배란일·임신 가능 기간 계산.</div><span class="card-tag">life</span></a>
-    <a href="/bmi/" class="card" data-cat="life"><div class="card-icon">⚖️</div><div class="card-title">BMI 계산기</div><div class="card-desc">키와 몸무게로 체질량지수와 비만도를 확인해요.</div><span class="card-tag">life</span></a>
-    <a href="/calorie/" class="card" data-cat="life"><div class="card-icon">🔥</div><div class="card-title">칼로리 계산기</div><div class="card-desc">하루 권장 칼로리·다이어트·유지·벌크업 목표 칼로리.</div><span class="card-tag">life</span></a>
-    <a href="/pace/" class="card" data-cat="life"><div class="card-icon">🏃</div><div class="card-title">페이스 계산기</div><div class="card-desc">달리기 페이스·완주 시간·마라톤 예상 기록 계산.</div><span class="card-tag">life</span></a>
-    <a href="/fuel/" class="card" data-cat="life"><div class="card-icon">🚗</div><div class="card-title">자동차 연비 계산기</div><div class="card-desc">실연비·예상 연료비·목적지까지 왕복 비용 계산.</div><span class="card-tag">life</span></a>
-    <a href="/pyeong/" class="card" data-cat="util"><div class="card-icon">🏡</div><div class="card-title">평수 계산기</div><div class="card-desc">㎡ ↔ 평 실시간 변환. 정확한 환산 공식 사용.</div><span class="card-tag">util</span></a>
-    <a href="/unit/" class="card" data-cat="util"><div class="card-icon">📐</div><div class="card-title">단위 변환</div><div class="card-desc">길이·무게·온도·부피·속도·데이터·압력·시간 변환.</div><span class="card-tag">util</span></a>
-    <a href="/percent/" class="card" data-cat="util"><div class="card-icon">🔢</div><div class="card-title">퍼센트 계산기</div><div class="card-desc">비율·증감률·역퍼센트 4가지 계산을 실시간으로.</div><span class="card-tag">util</span></a>
-    <a href="/discount/" class="card" data-cat="util"><div class="card-icon">🏷️</div><div class="card-title">할인 계산기</div><div class="card-desc">할인가·할인율·중복할인·정가 역산을 계산해요.</div><span class="card-tag">util</span></a>
-    <a href="/gpa/" class="card" data-cat="util"><div class="card-icon">🎓</div><div class="card-title">학점 계산기</div><div class="card-desc">4.5·4.3·4.0 만점 GPA를 과목별로 계산해요.</div><span class="card-tag">util</span></a>
-    <a href="/calculator/" class="card" data-cat="util"><div class="card-icon">🧮</div><div class="card-title">계산기</div><div class="card-desc">사칙연산·퍼센트·부동소수점 오차 없는 기본 계산기.</div><span class="card-tag">util</span></a>
+  <div class="conv-result" id="conv-result">
+    <div class="big" id="conv-big">—</div>
+    <div class="small" id="conv-small">—</div>
   </div>
-  <footer>
-    <span>calczip.kr</span> &nbsp;·&nbsp; 생활에 필요한 계산기를 모아둔 곳<br>
-    본 사이트의 모든 계산 결과는 참고용이며, 법적 효력이 없습니다.<br>
-    실제 금액은 관련 기관 및 전문가 확인을 권장합니다.
-  </footer>
-  <script>
-    function filterCards(cat,btn){
-      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.card').forEach(card=>{
-        card.style.display=(cat==='all'||card.dataset.cat===cat)?'':'none';
-      });
-    }
-  </script>
-</body>
-</html>
+</div>
+</main>
+<script>
+const CITIES = [
+  {name:'서울',tz:'Asia/Seoul',flag:'🇰🇷'},
+  {name:'도쿄',tz:'Asia/Tokyo',flag:'🇯🇵'},
+  {name:'베이징',tz:'Asia/Shanghai',flag:'🇨🇳'},
+  {name:'홍콩',tz:'Asia/Hong_Kong',flag:'🇭🇰'},
+  {name:'싱가포르',tz:'Asia/Singapore',flag:'🇸🇬'},
+  {name:'두바이',tz:'Asia/Dubai',flag:'🇦🇪'},
+  {name:'모스크바',tz:'Europe/Moscow',flag:'🇷🇺'},
+  {name:'파리',tz:'Europe/Paris',flag:'🇫🇷'},
+  {name:'런던',tz:'Europe/London',flag:'🇬🇧'},
+  {name:'뉴욕',tz:'America/New_York',flag:'🇺🇸'},
+  {name:'로스앤젤레스',tz:'America/Los_Angeles',flag:'🇺🇸'},
+  {name:'시드니',tz:'Australia/Sydney',flag:'🇦🇺'},
+];
+
+function getLocalTime(tz) {
+  const now = new Date();
+  const opts = {timeZone:tz, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false};
+  const dateOpts = {timeZone:tz, year:'numeric', month:'2-digit', day:'2-digit', weekday:'short'};
+  return {
+    time: new Intl.DateTimeFormat('ko-KR', opts).format(now),
+    date: new Intl.DateTimeFormat('ko-KR', dateOpts).format(now),
+    offset: getOffset(tz)
+  };
+}
+
+function getOffset(tz) {
+  const now = new Date();
+  const utcStr = now.toLocaleString('en-US', {timeZone:'UTC'});
+  const tzStr = now.toLocaleString('en-US', {timeZone:tz});
+  const diff = (new Date(tzStr) - new Date(utcStr)) / 3600000;
+  const h = Math.floor(Math.abs(diff)), m = Math.round((Math.abs(diff)%1)*60);
+  return 'UTC'+(diff>=0?'+':'-')+String(h).padStart(2,'0')+':'+(m?String(m).padStart(2,'0'):'00');
+}
+
+function renderCities() {
+  const grid = document.getElementById('city-grid');
+  grid.innerHTML = CITIES.map(c=>{
+    const t = getLocalTime(c.tz);
+    return `<div class="city-card">
+      <div class="city-name">${c.flag} ${c.name}</div>
+      <div class="city-tz">${t.offset}</div>
+      <div class="city-time" data-tz="${c.tz}">${t.time}</div>
+      <div class="city-date">${t.date}</div>
+    </div>`;
+  }).join('');
+}
+
+// 시간대 변환 셀렉트 구성
+function buildTZSelects() {
+  const opts = CITIES.map(c=>`<option value="${c.tz}">${c.flag} ${c.name}</option>`).join('');
+  document.getElementById('conv-from').innerHTML = opts;
+  document.getElementById('conv-to').innerHTML = opts;
+  document.getElementById('conv-to').value = 'America/New_York';
+  // 현재 시각 기본값
+  const now = new Date();
+  const pad = n=>String(n).padStart(2,'0');
+  document.getElementById('conv-dt').value =
+    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
+function convertTZ() {
+  const dtStr = document.getElementById('conv-dt').value;
+  const fromTZ = document.getElementById('conv-from').value;
+  const toTZ = document.getElementById('conv-to').value;
+  if (!dtStr) { alert('날짜와 시간을 입력해주세요.'); return; }
+  // 입력된 날짜시간을 from timezone 기준으로 해석
+  const [datePart, timePart] = dtStr.split('T');
+  const [y,mo,d] = datePart.split('-').map(Number);
+  const [h,m] = timePart.split(':').map(Number);
+  // from timezone의 UTC offset 구하기
+  const testDate = new Date(Date.UTC(y,mo-1,d,h,m));
+  const fromStr = testDate.toLocaleString('en-US',{timeZone:fromTZ,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  // 간단한 방법: Intl로 역산
+  const result = new Date(testDate);
+  const fromOffset = getOffsetMinutes(fromTZ, result);
+  const utcMs = testDate.getTime() - fromOffset * 60000;
+  const utcDate = new Date(utcMs);
+  const toOpts = {timeZone:toTZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false, weekday:'short'};
+  const converted = new Intl.DateTimeFormat('ko-KR', toOpts).format(utcDate);
+  const toOffset = getOffset(toTZ);
+  const fromName = CITIES.find(c=>c.tz===fromTZ)?.name || fromTZ;
+  const toName = CITIES.find(c=>c.tz===toTZ)?.name || toTZ;
+  document.getElementById('conv-big').textContent = converted;
+  document.getElementById('conv-small').textContent = `${fromName} → ${toName} (${toOffset})`;
+  document.getElementById('conv-result').classList.add('show');
+}
+
+function getOffsetMinutes(tz, date) {
+  const utcStr = date.toLocaleString('en-US',{timeZone:'UTC'});
+  const tzStr = date.toLocaleString('en-US',{timeZone:tz});
+  return (new Date(tzStr) - new Date(utcStr)) / 60000;
+}
+
+renderCities();
+buildTZSelects();
+setInterval(()=>{
+  document.querySelectorAll('.city-time[data-tz]').forEach(el=>{
+    const t = getLocalTime(el.dataset.tz);
+    el.textContent = t.time;
+  });
+}, 1000);
+</script>
+</body></html>
