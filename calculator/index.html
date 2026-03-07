@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>계산기 — CalcZip</title>
+  <meta name="description" content="사칙연산, 퍼센트, 제곱근 등 기본 계산기." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f5f4f0; --surface: #fff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-dark: #1d4ed8; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .back-btn { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    main { max-width: 400px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.8px; margin-bottom: 32px; }
+    .calc-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+    .display { padding: 24px 20px 16px; text-align: right; min-height: 96px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; }
+    .display-expr { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text-muted); min-height: 20px; word-break: break-all; }
+    .display-val { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 500; letter-spacing: -1px; word-break: break-all; }
+    .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+    .btn { padding: 18px 0; font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; border: none; cursor: pointer; transition: filter 0.1s; background: var(--surface); color: var(--text); }
+    .btn:hover { filter: brightness(0.95); }
+    .btn:active { filter: brightness(0.88); }
+    .btn.op { background: #f0ede6; color: var(--accent); }
+    .btn.eq { background: var(--accent); color: #fff; }
+    .btn.eq:hover { background: var(--accent-dark); filter: none; }
+    .btn.fn { background: #f5f4f0; color: var(--text-muted); font-size: 14px; }
+    .btn.zero { grid-column: span 2; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">calc<span>zip</span>.kr</a>
+      <a href="/" class="back-btn">← 전체 계산기</a>
+    </div>
+  </header>
+  <main>
+    <p class="page-label">Utility</p>
+    <h1>계산기</h1>
+    <div class="calc-wrap">
+      <div class="display">
+        <div class="display-expr" id="expr"></div>
+        <div class="display-val" id="disp">0</div>
+      </div>
+      <div class="buttons">
+        <button class="btn fn" onclick="allClear()">AC</button>
+        <button class="btn fn" onclick="toggleSign()">+/-</button>
+        <button class="btn fn" onclick="percent()">%</button>
+        <button class="btn op" onclick="inputOp('/')">÷</button>
+        <button class="btn" onclick="inputNum('7')">7</button>
+        <button class="btn" onclick="inputNum('8')">8</button>
+        <button class="btn" onclick="inputNum('9')">9</button>
+        <button class="btn op" onclick="inputOp('*')">×</button>
+        <button class="btn" onclick="inputNum('4')">4</button>
+        <button class="btn" onclick="inputNum('5')">5</button>
+        <button class="btn" onclick="inputNum('6')">6</button>
+        <button class="btn op" onclick="inputOp('-')">−</button>
+        <button class="btn" onclick="inputNum('1')">1</button>
+        <button class="btn" onclick="inputNum('2')">2</button>
+        <button class="btn" onclick="inputNum('3')">3</button>
+        <button class="btn op" onclick="inputOp('+')">+</button>
+        <button class="btn zero" onclick="inputNum('0')">0</button>
+        <button class="btn" onclick="inputDot()">.</button>
+        <button class="btn eq" onclick="calculate()">=</button>
+      </div>
+    </div>
+  </main>
+  <script>
+    // 부동소수점 오차 방지: 정수 스케일링 방식
+    function safeCalc(a, op, b) {
+      const scale = Math.pow(10, 10);
+      const A = Math.round(a * scale);
+      const B = Math.round(b * scale);
+      switch(op) {
+        case '+': return (A + B) / scale;
+        case '-': return (A - B) / scale;
+        case '*': return (A * B) / (scale * scale);
+        case '/': return b === 0 ? null : A / B;
+      }
+    }
+    let current = '0', prevVal = null, pendingOp = null, justCalc = false, exprStr = '';
+    const disp = document.getElementById('disp');
+    const expr = document.getElementById('expr');
+    function updateDisplay() {
+      let s = current;
+      if (s.length > 12) s = parseFloat(s).toExponential(6);
+      disp.textContent = s;
+    }
+    function inputNum(n) {
+      if (justCalc) { current = n; exprStr = ''; justCalc = false; }
+      else if (current === '0') current = n;
+      else if (current.length < 15) current += n;
+      updateDisplay();
+    }
+    function inputDot() {
+      if (justCalc) { current = '0.'; exprStr = ''; justCalc = false; }
+      else if (!current.includes('.')) current += '.';
+      updateDisplay();
+    }
+    function inputOp(op) {
+      justCalc = false;
+      if (pendingOp && !justCalc) {
+        const result = safeCalc(parseFloat(prevVal), pendingOp, parseFloat(current));
+        if (result === null) { current = 'Error'; prevVal = null; pendingOp = null; exprStr = ''; updateDisplay(); return; }
+        current = String(result);
+      }
+      prevVal = current;
+      pendingOp = op;
+      const opSym = {'+':'+', '-':'−', '*':'×', '/':'÷'}[op];
+      exprStr = current + ' ' + opSym;
+      expr.textContent = exprStr;
+      justCalc = true;
+      updateDisplay();
+    }
+    function calculate() {
+      if (!pendingOp || prevVal === null) return;
+      const a = parseFloat(prevVal), b = parseFloat(current);
+      exprStr = prevVal + ' ' + {'+':'+','-':'−','*':'×','/':'÷'}[pendingOp] + ' ' + current + ' =';
+      expr.textContent = exprStr;
+      const result = safeCalc(a, pendingOp, b);
+      if (result === null) { current = '오류: 0으로 나눌 수 없어요'; }
+      else { current = String(parseFloat(result.toFixed(10))); }
+      pendingOp = null; prevVal = null; justCalc = true;
+      updateDisplay();
+    }
+    function allClear() { current = '0'; prevVal = null; pendingOp = null; justCalc = false; exprStr = ''; expr.textContent = ''; updateDisplay(); }
+    function toggleSign() { if (current !== '0') { current = current.startsWith('-') ? current.slice(1) : '-' + current; updateDisplay(); } }
+    function percent() { current = String(parseFloat(current) / 100); updateDisplay(); }
+    document.addEventListener('keydown', e => {
+      if ('0123456789'.includes(e.key)) inputNum(e.key);
+      else if (e.key === '.') inputDot();
+      else if (e.key === '+') inputOp('+');
+      else if (e.key === '-') inputOp('-');
+      else if (e.key === '*') inputOp('*');
+      else if (e.key === '/') { e.preventDefault(); inputOp('/'); }
+      else if (e.key === 'Enter' || e.key === '=') calculate();
+      else if (e.key === 'Escape') allClear();
+      else if (e.key === 'Backspace') { if (current.length > 1) current = current.slice(0,-1); else current = '0'; updateDisplay(); }
+    });
+  </script>
+</body>
+</html>

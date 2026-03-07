@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>평수 계산기 — CalcZip</title><meta name="description" content="㎡(제곱미터)와 평을 상호 변환하세요. 아파트 평형 환산 계산기."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:600px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px}
+.conv-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.conv-row input{flex:1;padding:12px 16px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield;transition:border-color .15s}
+.conv-row input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.conv-row input::-webkit-outer-spin-button,.conv-row input::-webkit-inner-spin-button{-webkit-appearance:none}
+.conv-row .unit{font-size:14px;font-weight:700;color:var(--text-muted);width:36px;flex-shrink:0}
+.arrow{font-size:20px;color:var(--text-muted)}
+.preset-title{font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:500}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.preset-btn{padding:10px 0;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;text-align:center}
+.preset-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Life · Area</p>
+<h1>평수 계산기</h1>
+<p class="page-sub">㎡ ↔ 평 실시간 변환 · 1평 = 3.30579㎡ (정확한 환산)</p>
+<div class="card">
+  <div class="conv-row">
+    <input type="number" id="sqm" placeholder="0" oninput="fromSqm()" step="0.01"/>
+    <span class="unit">㎡</span>
+    <span class="arrow">⇄</span>
+    <input type="number" id="pyeong" placeholder="0" oninput="fromPyeong()" step="0.01"/>
+    <span class="unit">평</span>
+  </div>
+  <div class="preset-title">자주 쓰는 평형</div>
+  <div class="presets">
+    <button class="preset-btn" onclick="setPyeong(10)">10평<br><small>33.1㎡</small></button>
+    <button class="preset-btn" onclick="setPyeong(15)">15평<br><small>49.6㎡</small></button>
+    <button class="preset-btn" onclick="setPyeong(20)">20평<br><small>66.1㎡</small></button>
+    <button class="preset-btn" onclick="setPyeong(24)">24평<br><small>79.3㎡</small></button>
+    <button class="preset-btn" onclick="setPyeong(30)">30평<br><small>99.2㎡</small></button>
+    <button class="preset-btn" onclick="setPyeong(33)">33평<br><small>109.1㎡</small></button>
+    <button class="preset-btn" onclick="setPyeong(40)">40평<br><small>132.2㎡</small></button>
+    <button class="preset-btn" onclick="setPyeong(50)">50평<br><small>165.3㎡</small></button>
+  </div>
+</div>
+</main>
+<script>
+// 1평 = 400/121 ㎡ (정확한 정의값)
+const SQM_PER_PYEONG = 400/121; // ≈ 3.305785...
+function fromSqm(){
+  const v=parseFloat(document.getElementById('sqm').value);
+  document.getElementById('pyeong').value = v ? parseFloat((v/SQM_PER_PYEONG).toFixed(4)) : '';
+}
+function fromPyeong(){
+  const v=parseFloat(document.getElementById('pyeong').value);
+  document.getElementById('sqm').value = v ? parseFloat((v*SQM_PER_PYEONG).toFixed(4)) : '';
+}
+function setPyeong(p){
+  document.getElementById('pyeong').value=p;
+  fromPyeong();
+}
+</script>
+</body></html>

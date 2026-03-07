@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>배란일 계산기 — CalcZip</title><meta name="description" content="마지막 생리 시작일과 주기로 배란일, 임신 가능 기간을 계산하세요."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8;--pink:#db2777;--pink-light:#fdf2f8}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:700px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:580px){.layout{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px}
+.card-title{font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:20px;text-transform:uppercase}
+.field{margin-bottom:20px}
+label{display:block;font-size:13px;font-weight:500;margin-bottom:8px}
+.hint{font-weight:300;color:var(--text-muted);font-size:12px;margin-left:4px}
+input[type=date],input[type=number]{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--text);background:#fafaf8;outline:none;transition:border-color .15s;-moz-appearance:textfield}
+input[type=number]{font-family:'DM Mono',monospace;font-size:15px;padding-right:40px}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.btn{width:100%;margin-top:8px;padding:14px;background:var(--pink);color:#fff;border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn:hover{background:#be185d}
+.result-card{display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.result-card.show{display:block}
+.result-hero{background:var(--pink);padding:24px 28px;color:#fff;text-align:center}
+.rh-label{font-size:12px;opacity:.75;margin-bottom:6px;font-weight:300}
+.rh-date{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;letter-spacing:-0.5px}
+.rh-sub{font-size:12px;opacity:.7;margin-top:4px}
+.result-body{padding:24px 28px}
+.period-box{margin-bottom:16px;padding:14px 16px;border-radius:10px;background:var(--pink-light);border:1px solid #fbcfe8}
+.period-box-title{font-size:12px;color:var(--pink);font-weight:700;margin-bottom:6px}
+.period-dates{font-family:'DM Mono',monospace;font-size:15px;font-weight:500}
+.rr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.rr:last-child{border:none}
+.rl{color:var(--text-muted);font-weight:300}
+.rv{font-family:'DM Mono',monospace;font-weight:500}
+.calendar{margin-top:20px}
+.cal-title{font-size:13px;font-weight:700;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-header{text-align:center;font-size:11px;color:var(--text-muted);padding:4px 0;font-weight:500}
+.cal-day{text-align:center;padding:6px 2px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace}
+.cal-day.empty{background:none}
+.cal-day.normal{background:#f5f4f0}
+.cal-day.period{background:#fce7f3;color:#be185d;font-weight:700}
+.cal-day.fertile{background:#fde68a;color:#92400e;font-weight:700}
+.cal-day.ovulation{background:var(--pink);color:#fff;font-weight:700;border-radius:50%}
+.legend{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.info-box{margin-top:16px;padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#92400e;font-weight:300;line-height:1.6}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Life · Health</p>
+<h1>배란일 계산기</h1>
+<p class="page-sub">생리 주기 기반 · 배란일 · 임신 가능 기간 · 다음 생리 예정일</p>
+<div class="layout">
+  <div class="card">
+    <div class="card-title">입력</div>
+    <div class="field"><label>마지막 생리 시작일</label><input type="date" id="last-period"/></div>
+    <div class="field">
+      <label>생리 주기 <span class="hint">평균</span></label>
+      <input type="number" id="cycle" value="28" min="20" max="45"/>
+    </div>
+    <div class="field">
+      <label>생리 기간</label>
+      <input type="number" id="period-len" value="5" min="2" max="10"/>
+    </div>
+    <button class="btn" onclick="calculate()">배란일 계산하기</button>
+  </div>
+  <div id="result-card" class="result-card">
+    <div class="result-hero">
+      <div class="rh-label">예상 배란일</div>
+      <div class="rh-date" id="r-ovulation">—</div>
+      <div class="rh-sub" id="r-dday">—</div>
+    </div>
+    <div class="result-body">
+      <div class="period-box">
+        <div class="period-box-title">🟡 임신 가능 기간</div>
+        <div class="period-dates" id="r-fertile">—</div>
+      </div>
+      <div class="rr"><span class="rl">마지막 생리 시작일</span><span class="rv" id="r-last">—</span></div>
+      <div class="rr"><span class="rl">다음 생리 예정일</span><span class="rv" id="r-next">—</span></div>
+      <div class="rr"><span class="rl">생리 주기</span><span class="rv" id="r-cycle">—</span></div>
+      <div class="calendar">
+        <div class="cal-title">이번 달 캘린더</div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-dot" style="background:#fce7f3"></div>생리 기간</div>
+          <div class="leg"><div class="leg-dot" style="background:#fde68a"></div>임신 가능</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--pink)"></div>배란일</div>
+        </div>
+      </div>
+      <div class="info-box">⚠️ 본 계산은 규칙적인 생리 주기를 가정한 추정치예요. 실제 배란일은 개인마다 다를 수 있으며, 의학적 결정에는 전문의 상담을 권장해요.</div>
+    </div>
+  </div>
+</div>
+</main>
+<script>
+function fmtDate(d){ return d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}); }
+function fmtShort(d){ return `${d.getMonth()+1}/${d.getDate()}`; }
+function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
+function calculate(){
+  const lastStr=document.getElementById('last-period').value;
+  const cycle=parseInt(document.getElementById('cycle').value)||28;
+  const periodLen=parseInt(document.getElementById('period-len').value)||5;
+  if(!lastStr){alert('마지막 생리 시작일을 입력해주세요.');return;}
+  const last=new Date(lastStr);
+  // 배란일: 다음 생리 예정일 - 14일 (황체기 14일 고정)
+  const nextPeriod=addDays(last,cycle);
+  const ovulation=addDays(nextPeriod,-14);
+  // 임신 가능 기간: 배란일 -5일 ~ 배란일 +1일
+  const fertileStart=addDays(ovulation,-5);
+  const fertileEnd=addDays(ovulation,1);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const dday=Math.ceil((ovulation-today)/(1000*60*60*24));
+  document.getElementById('r-ovulation').textContent=fmtDate(ovulation);
+  document.getElementById('r-dday').textContent=dday>0?`D-${dday}`:dday===0?'오늘이에요!':dday===-1?'어제였어요':`${Math.abs(dday)}일 지났어요`;
+  document.getElementById('r-fertile').textContent=`${fmtDate(fertileStart)} ~ ${fmtDate(fertileEnd)}`;
+  document.getElementById('r-last').textContent=fmtDate(last);
+  document.getElementById('r-next').textContent=fmtDate(nextPeriod);
+  document.getElementById('r-cycle').textContent=cycle+'일';
+  renderCalendar(last, periodLen, ovulation, fertileStart, fertileEnd);
+  document.getElementById('result-card').classList.add('show');
+  setTimeout(()=>document.getElementById('result-card').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+function renderCalendar(last, periodLen, ovulation, fertileStart, fertileEnd){
+  // 배란일 기준 달력
+  const y=ovulation.getFullYear(), m=ovulation.getMonth();
+  const firstDay=new Date(y,m,1).getDay(); // 0=일
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const grid=document.getElementById('cal-grid');
+  const days=['일','월','화','수','목','금','토'];
+  let html=days.map(d=>`<div class="cal-header">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++) html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const date=new Date(y,m,d);
+    const isOvulation=date.toDateString()===ovulation.toDateString();
+    const isPeriod=date>=last&&date<addDays(last,periodLen);
+    const isFertile=date>=fertileStart&&date<=fertileEnd&&!isOvulation;
+    let cls='normal';
+    if(isOvulation) cls='ovulation';
+    else if(isFertile) cls='fertile';
+    else if(isPeriod) cls='period';
+    html+=`<div class="cal-day ${cls}">${d}</div>`;
+  }
+  grid.innerHTML=html;
+}
+</script>
+</body></html>

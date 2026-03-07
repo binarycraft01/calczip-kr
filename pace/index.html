@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>페이스 계산기 — CalcZip</title><meta name="description" content="달리기 페이스, 거리, 시간을 계산하세요. 마라톤 완주 예상 시간 계산."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:700px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:16px;text-transform:uppercase}
+.row{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.row label{font-size:13px;font-weight:500;width:80px;flex-shrink:0}
+.time-inputs{display:flex;gap:6px;align-items:center;flex:1}
+.time-inputs input{width:56px;padding:9px 8px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:15px;text-align:center;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield}
+.time-inputs input::-webkit-outer-spin-button,.time-inputs input::-webkit-inner-spin-button{-webkit-appearance:none}
+.time-inputs input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.time-inputs span{font-size:12px;color:var(--text-muted)}
+.num-input{flex:1;min-width:80px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:15px;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield}
+.num-input::-webkit-outer-spin-button,.num-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.num-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.unit{font-size:13px;color:var(--text-muted)}
+.calc-btn{width:100%;margin-top:8px;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.calc-btn:hover{background:var(--accent-dark)}
+.result{display:none;margin-top:16px;background:var(--accent);border-radius:12px;padding:20px;color:#fff;text-align:center}
+.result.show{display:block}
+.result .big{font-family:'DM Mono',monospace;font-size:40px;font-weight:500;letter-spacing:-1px}
+.result .sub{font-size:12px;opacity:.75;margin-top:4px}
+.races{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+.race-box{background:rgba(255,255,255,.15);border-radius:8px;padding:10px;text-align:center}
+.race-label{font-size:11px;opacity:.75;margin-bottom:4px}
+.race-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:700}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Life · Running</p>
+<h1>페이스 계산기</h1>
+<p class="page-sub">달리기 페이스 · 완주 시간 · 속도 변환</p>
+
+<!-- 거리 + 시간 → 페이스 -->
+<div class="card">
+  <div class="card-title">거리 + 시간 → 페이스</div>
+  <div class="row">
+    <label>거리</label>
+    <input class="num-input" type="number" id="p1dist" placeholder="10.0" step="0.1"/>
+    <span class="unit">km</span>
+  </div>
+  <div class="row">
+    <label>완주 시간</label>
+    <div class="time-inputs">
+      <input type="number" id="p1h" placeholder="0" min="0"/><span>시간</span>
+      <input type="number" id="p1m" placeholder="50" min="0" max="59"/><span>분</span>
+      <input type="number" id="p1s" placeholder="0" min="0" max="59"/><span>초</span>
+    </div>
+  </div>
+  <button class="calc-btn" onclick="calcPace()">페이스 계산</button>
+  <div class="result" id="res-pace">
+    <div class="big" id="r-pace">—</div>
+    <div class="sub">분/km (페이스)</div>
+    <div class="races">
+      <div class="race-box"><div class="race-label">속도</div><div class="race-val" id="r-speed">—</div></div>
+      <div class="race-box"><div class="race-label">5km 예상</div><div class="race-val" id="r-5k">—</div></div>
+      <div class="race-box"><div class="race-label">10km 예상</div><div class="race-val" id="r-10k">—</div></div>
+      <div class="race-box"><div class="race-label">하프 예상</div><div class="race-val" id="r-half">—</div></div>
+      <div class="race-box"><div class="race-label">풀마라톤</div><div class="race-val" id="r-full">—</div></div>
+      <div class="race-box"><div class="race-label">100km 예상</div><div class="race-val" id="r-100k">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 페이스 + 거리 → 시간 -->
+<div class="card">
+  <div class="card-title">페이스 + 거리 → 시간</div>
+  <div class="row">
+    <label>페이스</label>
+    <div class="time-inputs">
+      <input type="number" id="p2pm" placeholder="5" min="0"/><span>분</span>
+      <input type="number" id="p2ps" placeholder="0" min="0" max="59"/><span>초 /km</span>
+    </div>
+  </div>
+  <div class="row">
+    <label>거리</label>
+    <input class="num-input" type="number" id="p2dist" placeholder="42.195" step="0.001"/>
+    <span class="unit">km</span>
+  </div>
+  <button class="calc-btn" onclick="calcTime()">시간 계산</button>
+  <div class="result" id="res-time">
+    <div class="big" id="r-time">—</div>
+    <div class="sub" id="r-time-sub">완주 예상 시간</div>
+  </div>
+</div>
+</main>
+<script>
+function toSec(h,m,s){return (parseInt(h)||0)*3600+(parseInt(m)||0)*60+(parseInt(s)||0);}
+function fmtTime(totalSec){
+  const h=Math.floor(totalSec/3600), m=Math.floor((totalSec%3600)/60), s=Math.round(totalSec%60);
+  return h>0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
+}
+function calcPace(){
+  const dist=parseFloat(document.getElementById('p1dist').value);
+  const totalSec=toSec(document.getElementById('p1h').value,document.getElementById('p1m').value,document.getElementById('p1s').value);
+  if(!dist||!totalSec){alert('거리와 시간을 입력해주세요.');return;}
+  const paceSecPerKm=totalSec/dist;
+  const pm=Math.floor(paceSecPerKm/60), ps=Math.round(paceSecPerKm%60);
+  const speedKmh=(dist/(totalSec/3600)).toFixed(2);
+  document.getElementById('r-pace').textContent=`${pm}:${String(ps).padStart(2,'0')}`;
+  document.getElementById('r-speed').textContent=speedKmh+' km/h';
+  document.getElementById('r-5k').textContent=fmtTime(paceSecPerKm*5);
+  document.getElementById('r-10k').textContent=fmtTime(paceSecPerKm*10);
+  document.getElementById('r-half').textContent=fmtTime(paceSecPerKm*21.0975);
+  document.getElementById('r-full').textContent=fmtTime(paceSecPerKm*42.195);
+  document.getElementById('r-100k').textContent=fmtTime(paceSecPerKm*100);
+  document.getElementById('res-pace').classList.add('show');
+}
+function calcTime(){
+  const pm=parseInt(document.getElementById('p2pm').value)||0;
+  const ps=parseInt(document.getElementById('p2ps').value)||0;
+  const dist=parseFloat(document.getElementById('p2dist').value);
+  if(!dist||(!pm&&!ps)){alert('페이스와 거리를 입력해주세요.');return;}
+  const paceSecPerKm=pm*60+ps;
+  const totalSec=paceSecPerKm*dist;
+  document.getElementById('r-time').textContent=fmtTime(totalSec);
+  document.getElementById('r-time-sub').textContent=dist+'km 완주 예상 시간';
+  document.getElementById('res-time').classList.add('show');
+}
+</script>
+</body></html>

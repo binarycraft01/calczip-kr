@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>부가세 계산기 — CalcZip</title>
+  <meta name="description" content="부가세 포함·제외 금액을 빠르게 계산하세요. VAT 10% 기준."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8}
+    body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+    .header-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+    .logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}
+    .logo span{color:var(--accent)}
+    .back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+    main{max-width:600px;margin:0 auto;padding:40px 24px 80px}
+    .page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+    h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+    .page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px}
+    .field{margin-bottom:20px}
+    label{display:block;font-size:13px;font-weight:500;margin-bottom:8px}
+    .input-wrap{position:relative}
+    input[type=number]{width:100%;padding:10px 52px 10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:15px;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield;transition:border-color .15s,box-shadow .15s}
+    input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:var(--surface)}
+    .input-unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);pointer-events:none}
+    .tab-group{display:flex;gap:8px;margin-bottom:24px}
+    .tab-btn{flex:1;padding:10px 0;border:1px solid var(--border);border-radius:8px;background:#fafaf8;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all .15s}
+    .tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .calc-btn{width:100%;margin-top:8px;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
+    .calc-btn:hover{background:var(--accent-dark)}
+    .result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px}
+    .r-box{background:var(--bg);border-radius:10px;padding:16px;text-align:center}
+    .r-box.main{background:var(--accent);color:#fff}
+    .r-label{font-size:11px;color:var(--text-muted);margin-bottom:6px;font-weight:300}
+    .r-box.main .r-label{color:rgba(255,255,255,.75)}
+    .r-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:700}
+    .r-box.main .r-val{color:#fff;font-size:18px}
+  </style>
+</head>
+<body>
+  <header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+  <main>
+    <p class="page-label">Tax · VAT</p>
+    <h1>부가세 계산기</h1>
+    <p class="page-sub">VAT 10% 기준 · 공급가액 ↔ 부가세 포함가 계산</p>
+    <div class="card">
+      <div class="tab-group">
+        <button class="tab-btn active" id="tab-add" onclick="setMode('add')">부가세 추가</button>
+        <button class="tab-btn" id="tab-remove" onclick="setMode('remove')">부가세 제거</button>
+      </div>
+      <div class="field">
+        <label id="input-label">공급가액 (부가세 제외)</label>
+        <div class="input-wrap"><input type="number" id="amount" placeholder="예: 100000" oninput="calcVAT()" /><span class="input-unit">원</span></div>
+      </div>
+      <div class="result-grid">
+        <div class="r-box"><div class="r-label" id="rl1">공급가액</div><div class="r-val" id="rv1">—</div></div>
+        <div class="r-box"><div class="r-label">부가세 (10%)</div><div class="r-val" id="rv2">—</div></div>
+        <div class="r-box main"><div class="r-label" id="rl3">최종 금액</div><div class="r-val" id="rv3">—</div></div>
+      </div>
+    </div>
+  </main>
+  <script>
+    let mode = 'add';
+    function setMode(m) {
+      mode = m;
+      document.getElementById('tab-add').classList.toggle('active', m==='add');
+      document.getElementById('tab-remove').classList.toggle('active', m==='remove');
+      document.getElementById('input-label').textContent = m==='add' ? '공급가액 (부가세 제외)' : '부가세 포함 금액';
+      document.getElementById('rl1').textContent = m==='add' ? '공급가액' : '공급가액';
+      document.getElementById('rl3').textContent = m==='add' ? '부가세 포함' : '부가세 포함';
+      calcVAT();
+    }
+    function fmt(n) { return Math.round(n).toLocaleString('ko-KR')+'원'; }
+    function calcVAT() {
+      const v = parseFloat(document.getElementById('amount').value) || 0;
+      let supply, vat, total;
+      if (mode === 'add') {
+        supply = v; vat = Math.round(v*0.1); total = supply+vat;
+      } else {
+        // 부가세 포함가에서 역산 (정확한 공식: 공급가 = 포함가/1.1)
+        supply = Math.round(v/1.1); vat = v - supply; total = v;
+      }
+      document.getElementById('rv1').textContent = v ? fmt(supply) : '—';
+      document.getElementById('rv2').textContent = v ? fmt(vat) : '—';
+      document.getElementById('rv3').textContent = v ? fmt(total) : '—';
+    }
+  </script>
+</body>
+</html>

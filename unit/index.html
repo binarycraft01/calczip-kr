@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>단위 변환 계산기 — CalcZip</title><meta name="description" content="길이, 무게, 온도, 부피, 속도, 데이터, 압력, 시간 단위를 변환하세요."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:800px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:24px}
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.cat-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.cat-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px}
+.conv-area{display:flex;align-items:center;gap:12px}
+.conv-block{flex:1}
+.conv-block input{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield;transition:border-color .15s}
+.conv-block input::-webkit-outer-spin-button,.conv-block input::-webkit-inner-spin-button{-webkit-appearance:none}
+.conv-block input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.conv-block select{width:100%;margin-top:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:#fafaf8;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.swap-btn{padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:18px;flex-shrink:0;transition:all .15s}
+.swap-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.all-results{margin-top:20px}
+.all-results-title{font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:500}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.result-chip{background:var(--bg);border-radius:8px;padding:10px 12px}
+.chip-unit{font-size:11px;color:var(--text-muted);margin-bottom:3px}
+.chip-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;word-break:break-all}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Utility · Unit</p>
+<h1>단위 변환</h1>
+<p class="page-sub">길이 · 무게 · 온도 · 부피 · 속도 · 데이터 · 압력 · 시간</p>
+<div class="cat-tabs">
+  <button class="cat-btn active" onclick="setCat('length')">길이</button>
+  <button class="cat-btn" onclick="setCat('weight')">무게</button>
+  <button class="cat-btn" onclick="setCat('temp')">온도</button>
+  <button class="cat-btn" onclick="setCat('volume')">부피</button>
+  <button class="cat-btn" onclick="setCat('speed')">속도</button>
+  <button class="cat-btn" onclick="setCat('data')">데이터</button>
+  <button class="cat-btn" onclick="setCat('pressure')">압력</button>
+  <button class="cat-btn" onclick="setCat('time')">시간</button>
+</div>
+<div class="card">
+  <div class="conv-area">
+    <div class="conv-block">
+      <input type="number" id="from-val" placeholder="값 입력" oninput="convert('from')"/>
+      <select id="from-unit" onchange="convert('from')"></select>
+    </div>
+    <button class="swap-btn" onclick="swapUnits()">⇄</button>
+    <div class="conv-block">
+      <input type="number" id="to-val" placeholder="결과" oninput="convert('to')"/>
+      <select id="to-unit" onchange="convert('from')"></select>
+    </div>
+  </div>
+  <div class="all-results" id="all-results"></div>
+</div>
+</main>
+<script>
+// 모든 단위 → SI 기준값으로 변환 계수 (온도는 별도 처리)
+const CATS = {
+  length: {
+    label:'길이', si:'m',
+    units:[
+      {k:'km',l:'킬로미터 (km)',f:1000},{k:'m',l:'미터 (m)',f:1},{k:'cm',l:'센티미터 (cm)',f:0.01},
+      {k:'mm',l:'밀리미터 (mm)',f:0.001},{k:'mi',l:'마일 (mi)',f:1609.344},
+      {k:'yd',l:'야드 (yd)',f:0.9144},{k:'ft',l:'피트 (ft)',f:0.3048},
+      {k:'in',l:'인치 (in)',f:0.0254},{k:'nm',l:'해리 (nm)',f:1852},
+      {k:'au',l:'천문단위 (AU)',f:1.495978707e11}
+    ]
+  },
+  weight: {
+    label:'무게', si:'kg',
+    units:[
+      {k:'t',l:'톤 (t)',f:1000},{k:'kg',l:'킬로그램 (kg)',f:1},{k:'g',l:'그램 (g)',f:0.001},
+      {k:'mg',l:'밀리그램 (mg)',f:1e-6},{k:'lb',l:'파운드 (lb)',f:0.45359237},
+      {k:'oz',l:'온스 (oz)',f:0.028349523125},{k:'근',l:'근 (600g)',f:0.6},
+      {k:'돈',l:'돈 (3.75g)',f:0.00375},{k:'냥',l:'냥 (37.5g)',f:0.0375}
+    ]
+  },
+  temp: {
+    label:'온도', si:'C', special:true,
+    units:[{k:'C',l:'섭씨 (°C)'},{k:'F',l:'화씨 (°F)'},{k:'K',l:'켈빈 (K)'}]
+  },
+  volume: {
+    label:'부피', si:'L',
+    units:[
+      {k:'kL',l:'킬로리터 (kL)',f:1000},{k:'L',l:'리터 (L)',f:1},{k:'mL',l:'밀리리터 (mL)',f:0.001},
+      {k:'m3',l:'세제곱미터 (m³)',f:1000},{k:'cm3',l:'세제곱센티미터 (cm³)',f:0.001},
+      {k:'gal',l:'갤런 US (gal)',f:3.785411784},{k:'qt',l:'쿼트 (qt)',f:0.946352946},
+      {k:'pt',l:'파인트 (pt)',f:0.473176473},{k:'fl_oz',l:'온스 US (fl oz)',f:0.029573529625},
+      {k:'tsp',l:'티스푼 (tsp)',f:0.004928921594},{k:'tbsp',l:'테이블스푼 (tbsp)',f:0.014786764782}
+    ]
+  },
+  speed: {
+    label:'속도', si:'m/s',
+    units:[
+      {k:'m/s',l:'미터/초 (m/s)',f:1},{k:'km/h',l:'킬로미터/시 (km/h)',f:1/3.6},
+      {k:'mph',l:'마일/시 (mph)',f:0.44704},{k:'kt',l:'노트 (kt)',f:0.514444},
+      {k:'mach',l:'마하 (Mach)',f:340.29}
+    ]
+  },
+  data: {
+    label:'데이터', si:'bit',
+    units:[
+      {k:'bit',l:'비트 (bit)',f:1},{k:'B',l:'바이트 (B)',f:8},
+      {k:'KB',l:'킬로바이트 (KB)',f:8*1024},{k:'MB',l:'메가바이트 (MB)',f:8*1024**2},
+      {k:'GB',l:'기가바이트 (GB)',f:8*1024**3},{k:'TB',l:'테라바이트 (TB)',f:8*1024**4},
+      {k:'PB',l:'페타바이트 (PB)',f:8*1024**5},{k:'Kbps',l:'킬로비트/초 (Kbps)',f:1000},
+      {k:'Mbps',l:'메가비트/초 (Mbps)',f:1e6},{k:'Gbps',l:'기가비트/초 (Gbps)',f:1e9}
+    ]
+  },
+  pressure: {
+    label:'압력', si:'Pa',
+    units:[
+      {k:'Pa',l:'파스칼 (Pa)',f:1},{k:'kPa',l:'킬로파스칼 (kPa)',f:1000},
+      {k:'MPa',l:'메가파스칼 (MPa)',f:1e6},{k:'bar',l:'바 (bar)',f:1e5},
+      {k:'atm',l:'기압 (atm)',f:101325},{k:'mmHg',l:'수은주mm (mmHg)',f:133.322},
+      {k:'psi',l:'PSI',f:6894.757},{k:'kgf/cm2',l:'kgf/cm²',f:98066.5}
+    ]
+  },
+  time: {
+    label:'시간', si:'s',
+    units:[
+      {k:'y',l:'년 (y)',f:31557600},{k:'mo',l:'월 (mo)',f:2629800},
+      {k:'wk',l:'주 (wk)',f:604800},{k:'d',l:'일 (d)',f:86400},
+      {k:'h',l:'시간 (h)',f:3600},{k:'min',l:'분 (min)',f:60},
+      {k:'s',l:'초 (s)',f:1},{k:'ms',l:'밀리초 (ms)',f:0.001},
+      {k:'µs',l:'마이크로초 (µs)',f:1e-6},{k:'ns',l:'나노초 (ns)',f:1e-9}
+    ]
+  }
+};
+
+let currentCat = 'length';
+
+function setCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach((b,i)=>{
+    b.classList.toggle('active', Object.keys(CATS)[i]===cat);
+  });
+  buildSelects(cat);
+  document.getElementById('from-val').value='';
+  document.getElementById('to-val').value='';
+  document.getElementById('all-results').innerHTML='';
+}
+
+function buildSelects(cat) {
+  const c = CATS[cat];
+  const fs = document.getElementById('from-unit');
+  const ts = document.getElementById('to-unit');
+  fs.innerHTML = c.units.map(u=>`<option value="${u.k}">${u.l}</option>`).join('');
+  ts.innerHTML = c.units.map(u=>`<option value="${u.k}">${u.l}</option>`).join('');
+  ts.selectedIndex = 1;
+}
+
+function toSI(val, unitKey, cat) {
+  const c = CATS[cat];
+  if (c.special) { // 온도
+    if (unitKey==='C') return val;
+    if (unitKey==='F') return (val-32)*5/9;
+    if (unitKey==='K') return val-273.15;
+  }
+  return val * c.units.find(u=>u.k===unitKey).f;
+}
+function fromSI(siVal, unitKey, cat) {
+  const c = CATS[cat];
+  if (c.special) {
+    if (unitKey==='C') return siVal;
+    if (unitKey==='F') return siVal*9/5+32;
+    if (unitKey==='K') return siVal+273.15;
+  }
+  return siVal / c.units.find(u=>u.k===unitKey).f;
+}
+
+function fmt(n) {
+  if (Math.abs(n) >= 1e10 || (Math.abs(n) < 1e-6 && n !== 0)) return n.toExponential(6);
+  return parseFloat(n.toPrecision(10)).toLocaleString('ko-KR', {maximumFractionDigits:8});
+}
+
+function convert(dir) {
+  const cat = currentCat;
+  const fromUnit = document.getElementById('from-unit').value;
+  const toUnit = document.getElementById('to-unit').value;
+  let val;
+  if (dir==='from') {
+    val = parseFloat(document.getElementById('from-val').value);
+    if (isNaN(val)) { document.getElementById('to-val').value=''; showAll(null, cat, fromUnit); return; }
+    const si = toSI(val, fromUnit, cat);
+    const result = fromSI(si, toUnit, cat);
+    document.getElementById('to-val').value = parseFloat(result.toPrecision(10));
+    showAll(si, cat, fromUnit);
+  } else {
+    val = parseFloat(document.getElementById('to-val').value);
+    if (isNaN(val)) { document.getElementById('from-val').value=''; showAll(null, cat, fromUnit); return; }
+    const si = toSI(val, toUnit, cat);
+    const result = fromSI(si, fromUnit, cat);
+    document.getElementById('from-val').value = parseFloat(result.toPrecision(10));
+    showAll(si, cat, toUnit);
+  }
+}
+
+function showAll(siVal, cat, sourceUnit) {
+  const c = CATS[cat];
+  const el = document.getElementById('all-results');
+  if (siVal===null) { el.innerHTML=''; return; }
+  el.innerHTML = `<div class="all-results-title">모든 단위 변환 결과</div><div class="results-grid">`
+    + c.units.map(u=>{
+        const v = fromSI(siVal, u.k, cat);
+        return `<div class="result-chip"><div class="chip-unit">${u.l}</div><div class="chip-val">${fmt(v)}</div></div>`;
+      }).join('')
+    + '</div>';
+}
+
+function swapUnits() {
+  const fv=document.getElementById('from-val').value, tv=document.getElementById('to-val').value;
+  const fu=document.getElementById('from-unit').value, tu=document.getElementById('to-unit').value;
+  document.getElementById('from-unit').value=tu;
+  document.getElementById('to-unit').value=fu;
+  document.getElementById('from-val').value=tv;
+  document.getElementById('to-val').value=fv;
+  if(tv) convert('from');
+}
+
+// 초기화
+buildSelects('length');
+</script>
+</body></html>

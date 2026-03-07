@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>학점 계산기 — CalcZip</title><meta name="description" content="GPA 학점을 자동으로 계산하세요. 과목별 학점·성적 입력으로 평균 학점 계산."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8;--green:#16a34a}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:700px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px}
+.tab-group{display:flex;gap:8px;margin-bottom:20px}
+.tab-btn{flex:1;padding:9px 0;border:1px solid var(--border);border-radius:8px;background:#fafaf8;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.subject-row{display:grid;grid-template-columns:1fr 80px 120px 36px;gap:8px;align-items:center;margin-bottom:8px}
+.subject-row input,.subject-row select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:#fafaf8;outline:none;width:100%}
+.subject-row input::-webkit-outer-spin-button,.subject-row input::-webkit-inner-spin-button{-webkit-appearance:none}
+.subject-row input[type=number]{-moz-appearance:textfield}
+.subject-row input:focus,.subject-row select:focus{border-color:var(--accent)}
+.subject-row select{appearance:none;cursor:pointer}
+.del-btn{padding:8px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;color:var(--text-muted);transition:all .15s}
+.del-btn:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+.add-btn{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text-muted);cursor:pointer;margin-top:4px;transition:all .15s}
+.add-btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.result-hero{background:var(--accent);border-radius:12px;padding:24px;color:#fff;text-align:center;margin-top:20px}
+.result-hero .big{font-family:'DM Mono',monospace;font-size:52px;font-weight:500;letter-spacing:-2px;line-height:1}
+.result-hero .sub{font-size:13px;opacity:.75;margin-top:6px}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.rg-box{background:rgba(255,255,255,.15);border-radius:8px;padding:12px;text-align:center}
+.rg-label{font-size:11px;opacity:.75;margin-bottom:4px}
+.rg-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:700}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Life · GPA</p>
+<h1>학점 계산기</h1>
+<p class="page-sub">4.5 / 4.3 / 4.0 만점 · 과목별 학점·성적 입력 → GPA 자동 계산</p>
+<div class="card">
+  <div class="tab-group">
+    <button class="tab-btn active" id="t45" onclick="setScale(4.5)">4.5 만점</button>
+    <button class="tab-btn" id="t43" onclick="setScale(4.3)">4.3 만점</button>
+    <button class="tab-btn" id="t40" onclick="setScale(4.0)">4.0 만점</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 80px 120px 36px;gap:8px;margin-bottom:6px">
+    <span style="font-size:11px;color:var(--text-muted);padding-left:4px">과목명 (선택)</span>
+    <span style="font-size:11px;color:var(--text-muted)">학점</span>
+    <span style="font-size:11px;color:var(--text-muted)">성적</span>
+    <span></span>
+  </div>
+  <div id="subjects"></div>
+  <button class="add-btn" onclick="addRow()">+ 과목 추가</button>
+  <div id="result-hero" class="result-hero" style="display:none">
+    <div class="big" id="r-gpa">0.00</div>
+    <div class="sub" id="r-scale-label">/ 4.5 만점</div>
+    <div class="result-grid">
+      <div class="rg-box"><div class="rg-label">총 이수학점</div><div class="rg-val" id="r-credits">0</div></div>
+      <div class="rg-box"><div class="rg-label">과목 수</div><div class="rg-val" id="r-count">0</div></div>
+      <div class="rg-box"><div class="rg-label">4.0 환산</div><div class="rg-val" id="r-40">0.00</div></div>
+    </div>
+  </div>
+</div>
+</main>
+<script>
+let scale = 4.5;
+const grades45 = {'A+':4.5,'A0':4.0,'A-':4.0,'B+':3.5,'B0':3.0,'B-':3.0,'C+':2.5,'C0':2.0,'C-':2.0,'D+':1.5,'D0':1.0,'D-':1.0,'F':0,'P':null};
+const grades43 = {'A+':4.3,'A0':4.0,'A-':3.7,'B+':3.3,'B0':3.0,'B-':2.7,'C+':2.3,'C0':2.0,'C-':1.7,'D+':1.3,'D0':1.0,'D-':0.7,'F':0,'P':null};
+const grades40 = {'A':4.0,'B':3.0,'C':2.0,'D':1.0,'F':0,'P':null};
+function getGrades(){ return scale===4.5?grades45:scale===4.3?grades43:grades40; }
+function setScale(s){
+  scale=s;
+  document.getElementById('t45').classList.toggle('active',s===4.5);
+  document.getElementById('t43').classList.toggle('active',s===4.3);
+  document.getElementById('t40').classList.toggle('active',s===4.0);
+  document.getElementById('r-scale-label').textContent='/ '+s+' 만점';
+  document.querySelectorAll('.grade-sel').forEach(sel=>{
+    const cur=sel.value; sel.innerHTML='';
+    Object.keys(getGrades()).forEach(g=>{ const o=document.createElement('option'); o.value=g; o.textContent=g; sel.appendChild(o); });
+    if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+  });
+  calcGPA();
+}
+let rowId=0;
+function addRow(){
+  const id=rowId++;
+  const div=document.createElement('div'); div.className='subject-row'; div.id='row-'+id;
+  const grades=getGrades();
+  const opts=Object.keys(grades).map(g=>`<option value="${g}">${g}</option>`).join('');
+  div.innerHTML=`<input type="text" placeholder="과목명"/>
+    <input type="number" class="credit-input" value="3" min="0.5" max="6" step="0.5" oninput="calcGPA()"/>
+    <select class="grade-sel" onchange="calcGPA()">${opts}</select>
+    <button class="del-btn" onclick="delRow(${id})">✕</button>`;
+  document.getElementById('subjects').appendChild(div);
+  calcGPA();
+}
+function delRow(id){ document.getElementById('row-'+id)?.remove(); calcGPA(); }
+function calcGPA(){
+  const rows=document.querySelectorAll('.subject-row');
+  let totalPoints=0, totalCredits=0, count=0;
+  const grades=getGrades();
+  rows.forEach(row=>{
+    const credit=parseFloat(row.querySelector('.credit-input').value)||0;
+    const grade=row.querySelector('.grade-sel').value;
+    const pts=grades[grade];
+    if(pts===null||credit===0) return; // P/F 제외
+    totalPoints+=pts*credit; totalCredits+=credit; count++;
+  });
+  const hero=document.getElementById('result-hero');
+  if(totalCredits===0){ hero.style.display='none'; return; }
+  hero.style.display='block';
+  const gpa=totalPoints/totalCredits;
+  document.getElementById('r-gpa').textContent=gpa.toFixed(2);
+  document.getElementById('r-credits').textContent=totalCredits;
+  document.getElementById('r-count').textContent=count;
+  document.getElementById('r-40').textContent=(gpa/scale*4).toFixed(2);
+}
+// 기본 3과목
+addRow(); addRow(); addRow();
+</script>
+</body></html>

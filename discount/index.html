@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>할인 계산기 — CalcZip</title><meta name="description" content="할인가, 할인율, 절약 금액을 계산하세요."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8;--red:#dc2626;--green:#16a34a}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:700px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:560px){.layout{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px}
+.card-title{font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px}
+.field{margin-bottom:16px}
+label{display:block;font-size:13px;font-weight:500;margin-bottom:6px}
+.iw{position:relative}
+input[type=number]{width:100%;padding:9px 44px 9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:14px;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield;transition:border-color .15s}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.iu{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);pointer-events:none}
+.btn{width:100%;margin-top:4px;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--accent-dark)}
+.result{margin-top:16px;display:none;gap:10px;flex-direction:column}
+.result.show{display:flex}
+.rr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.rr:last-child{border:none}
+.rr .rl{color:var(--text-muted);font-weight:300}
+.rr .rv{font-family:'DM Mono',monospace;font-weight:700}
+.rr.main .rv{color:var(--accent);font-size:16px}
+.rr.save .rv{color:var(--green)}
+.rr.red .rv{color:var(--red)}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Utility · Discount</p>
+<h1>할인 계산기</h1>
+<p class="page-sub">할인가 계산 · 할인율 역산 · 중복 할인</p>
+<div class="layout">
+  <!-- 정가 + 할인율 → 할인가 -->
+  <div class="card">
+    <div class="card-title">정가 × 할인율 → 할인가</div>
+    <div class="field"><label>정가</label><div class="iw"><input type="number" id="d1p" placeholder="100000" oninput="calc1()"/><span class="iu">원</span></div></div>
+    <div class="field"><label>할인율</label><div class="iw"><input type="number" id="d1r" placeholder="30" oninput="calc1()"/><span class="iu">%</span></div></div>
+    <div class="result" id="res1">
+      <div class="rr save"><span class="rl">절약 금액</span><span class="rv" id="d1save">—</span></div>
+      <div class="rr main"><span class="rl">할인가</span><span class="rv" id="d1result">—</span></div>
+    </div>
+  </div>
+  <!-- 정가 + 할인가 → 할인율 -->
+  <div class="card">
+    <div class="card-title">정가 ÷ 할인가 → 할인율</div>
+    <div class="field"><label>정가</label><div class="iw"><input type="number" id="d2p" placeholder="100000" oninput="calc2()"/><span class="iu">원</span></div></div>
+    <div class="field"><label>할인가</label><div class="iw"><input type="number" id="d2s" placeholder="70000" oninput="calc2()"/><span class="iu">원</span></div></div>
+    <div class="result" id="res2">
+      <div class="rr save"><span class="rl">절약 금액</span><span class="rv" id="d2save">—</span></div>
+      <div class="rr main"><span class="rl">할인율</span><span class="rv" id="d2result">—</span></div>
+    </div>
+  </div>
+  <!-- 중복 할인 -->
+  <div class="card">
+    <div class="card-title">중복 할인 계산</div>
+    <div class="field"><label>정가</label><div class="iw"><input type="number" id="d3p" placeholder="100000" oninput="calc3()"/><span class="iu">원</span></div></div>
+    <div class="field"><label>1차 할인율</label><div class="iw"><input type="number" id="d3r1" placeholder="20" oninput="calc3()"/><span class="iu">%</span></div></div>
+    <div class="field"><label>2차 할인율</label><div class="iw"><input type="number" id="d3r2" placeholder="10" oninput="calc3()"/><span class="iu">%</span></div></div>
+    <div class="result" id="res3">
+      <div class="rr"><span class="rl">실제 할인율</span><span class="rv" id="d3rate">—</span></div>
+      <div class="rr save"><span class="rl">절약 금액</span><span class="rv" id="d3save">—</span></div>
+      <div class="rr main"><span class="rl">최종 할인가</span><span class="rv" id="d3result">—</span></div>
+    </div>
+  </div>
+  <!-- 역산: 할인가 + 할인율 → 정가 -->
+  <div class="card">
+    <div class="card-title">할인가 → 정가 역산</div>
+    <div class="field"><label>할인가</label><div class="iw"><input type="number" id="d4s" placeholder="70000" oninput="calc4()"/><span class="iu">원</span></div></div>
+    <div class="field"><label>할인율</label><div class="iw"><input type="number" id="d4r" placeholder="30" oninput="calc4()"/><span class="iu">%</span></div></div>
+    <div class="result" id="res4">
+      <div class="rr save"><span class="rl">절약 금액</span><span class="rv" id="d4save">—</span></div>
+      <div class="rr main"><span class="rl">원래 정가</span><span class="rv" id="d4result">—</span></div>
+    </div>
+  </div>
+</div>
+</main>
+<script>
+function fmt(n){return Math.round(n).toLocaleString('ko-KR')+'원';}
+function calc1(){
+  const p=parseFloat(document.getElementById('d1p').value),r=parseFloat(document.getElementById('d1r').value);
+  const res=document.getElementById('res1');
+  if(!p||isNaN(r)){res.classList.remove('show');return;}
+  const disc=p*r/100, sale=p-disc;
+  document.getElementById('d1save').textContent=fmt(disc);
+  document.getElementById('d1result').textContent=fmt(sale);
+  res.classList.add('show');
+}
+function calc2(){
+  const p=parseFloat(document.getElementById('d2p').value),s=parseFloat(document.getElementById('d2s').value);
+  const res=document.getElementById('res2');
+  if(!p||!s){res.classList.remove('show');return;}
+  const disc=p-s, rate=(disc/p*100).toFixed(1);
+  document.getElementById('d2save').textContent=fmt(disc);
+  document.getElementById('d2result').textContent=rate+'%';
+  res.classList.add('show');
+}
+function calc3(){
+  const p=parseFloat(document.getElementById('d3p').value),r1=parseFloat(document.getElementById('d3r1').value),r2=parseFloat(document.getElementById('d3r2').value);
+  const res=document.getElementById('res3');
+  if(!p||isNaN(r1)||isNaN(r2)){res.classList.remove('show');return;}
+  const after1=p*(1-r1/100), final=after1*(1-r2/100);
+  const totalRate=((p-final)/p*100).toFixed(1);
+  document.getElementById('d3rate').textContent=totalRate+'%';
+  document.getElementById('d3save').textContent=fmt(p-final);
+  document.getElementById('d3result').textContent=fmt(final);
+  res.classList.add('show');
+}
+function calc4(){
+  const s=parseFloat(document.getElementById('d4s').value),r=parseFloat(document.getElementById('d4r').value);
+  const res=document.getElementById('res4');
+  if(!s||isNaN(r)||r>=100){res.classList.remove('show');return;}
+  const original=s/(1-r/100), disc=original-s;
+  document.getElementById('d4save').textContent=fmt(disc);
+  document.getElementById('d4result').textContent=fmt(original);
+  res.classList.add('show');
+}
+</script>
+</body></html>

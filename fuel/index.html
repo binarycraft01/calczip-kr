@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>자동차 연비 계산기 — CalcZip</title><meta name="description" content="자동차 연비와 예상 연료비를 계산하세요. 주행거리·주유량·유가 입력."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-dark:#1d4ed8}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+main{max-width:800px;margin:0 auto;padding:40px 24px 80px}
+.page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:620px){.layout{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px}
+.card-title{font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:20px;text-transform:uppercase}
+.field{margin-bottom:18px}
+label{display:block;font-size:13px;font-weight:500;margin-bottom:7px}
+.iw{position:relative}
+input[type=number]{width:100%;padding:10px 52px 10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:15px;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield;transition:border-color .15s}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.iu{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);pointer-events:none}
+.btn{width:100%;margin-top:8px;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--accent-dark)}
+.result-card{display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.result-card.show{display:block}
+.result-hero{background:var(--accent);padding:28px;color:#fff;text-align:center}
+.rh-label{font-size:12px;opacity:.75;margin-bottom:8px;font-weight:300}
+.rh-val{font-family:'DM Mono',monospace;font-size:42px;font-weight:500;letter-spacing:-1px}
+.rh-sub{font-size:12px;opacity:.7;margin-top:4px}
+.result-body{padding:24px 28px}
+.rr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.rr:last-child{border:none}
+.rl{color:var(--text-muted);font-weight:300}
+.rv{font-family:'DM Mono',monospace;font-weight:500}
+.share-row{margin-top:12px}
+.share-btn{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;color:var(--text-muted)}
+.share-btn:hover{background:var(--bg)}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+<main>
+<p class="page-label">Life · Car</p>
+<h1>자동차 연비 계산기</h1>
+<p class="page-sub">실연비 계산 · 예상 연료비 · 구간별 비용</p>
+<div class="layout">
+  <div class="card">
+    <div class="card-title">연비 계산</div>
+    <div class="field"><label>주행 거리</label><div class="iw"><input type="number" id="distance" placeholder="500" step="0.1"/><span class="iu">km</span></div></div>
+    <div class="field"><label>주유량</label><div class="iw"><input type="number" id="fuel" placeholder="40" step="0.1"/><span class="iu">L</span></div></div>
+    <div class="field"><label>유가</label><div class="iw"><input type="number" id="price" placeholder="1700"/><span class="iu">원/L</span></div></div>
+    <button class="btn" onclick="calcFuel()">연비 계산하기</button>
+  </div>
+  <div id="result-card" class="result-card">
+    <div class="result-hero">
+      <div class="rh-label">실연비</div>
+      <div class="rh-val" id="r-mpg">—</div>
+      <div class="rh-sub">km/L</div>
+    </div>
+    <div class="result-body">
+      <div class="rr"><span class="rl">주행 거리</span><span class="rv" id="r-dist">—</span></div>
+      <div class="rr"><span class="rl">주유량</span><span class="rv" id="r-fuel">—</span></div>
+      <div class="rr"><span class="rl">주유 비용</span><span class="rv" id="r-cost">—</span></div>
+      <div class="rr"><span class="rl">100km당 연료비</span><span class="rv" id="r-per100">—</span></div>
+      <div class="rr"><span class="rl">1km당 연료비</span><span class="rv" id="r-per1">—</span></div>
+      <div class="share-row"><button class="share-btn" onclick="resetAll()">↺ 다시 계산</button></div>
+    </div>
+  </div>
+
+  <!-- 목적지 연료비 계산 -->
+  <div class="card" style="grid-column:1/-1">
+    <div class="card-title">목적지 연료비 예측</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="field"><label>예상 연비</label><div class="iw"><input type="number" id="exp-mpg" placeholder="12" step="0.1"/><span class="iu">km/L</span></div></div>
+      <div class="field"><label>목적지 거리</label><div class="iw"><input type="number" id="exp-dist" placeholder="300" step="1"/><span class="iu">km</span></div></div>
+      <div class="field"><label>유가</label><div class="iw"><input type="number" id="exp-price" placeholder="1700"/><span class="iu">원/L</span></div></div>
+    </div>
+    <button class="btn" onclick="calcExpected()">연료비 예측</button>
+    <div id="exp-result" style="display:none;margin-top:16px;background:var(--accent);border-radius:10px;padding:16px;color:#fff;display:none;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+      <div><div style="font-size:11px;opacity:.75;margin-bottom:4px">필요 연료</div><div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700" id="exp-liters">—</div></div>
+      <div><div style="font-size:11px;opacity:.75;margin-bottom:4px">편도 연료비</div><div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700" id="exp-one">—</div></div>
+      <div><div style="font-size:11px;opacity:.75;margin-bottom:4px">왕복 연료비</div><div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700" id="exp-round">—</div></div>
+    </div>
+  </div>
+</div>
+</main>
+<script>
+function fmt(n){return Math.round(n).toLocaleString('ko-KR')+'원';}
+function calcFuel(){
+  const d=parseFloat(document.getElementById('distance').value);
+  const f=parseFloat(document.getElementById('fuel').value);
+  const p=parseFloat(document.getElementById('price').value)||0;
+  if(!d||!f){alert('주행거리와 주유량을 입력해주세요.');return;}
+  const mpg=d/f;
+  const cost=f*p;
+  document.getElementById('r-mpg').textContent=mpg.toFixed(2);
+  document.getElementById('r-dist').textContent=d.toLocaleString()+'km';
+  document.getElementById('r-fuel').textContent=f.toLocaleString()+'L';
+  document.getElementById('r-cost').textContent=p?fmt(cost):'유가 미입력';
+  document.getElementById('r-per100').textContent=p?fmt(100/mpg*p):'유가 미입력';
+  document.getElementById('r-per1').textContent=p?Math.round(p/mpg).toLocaleString()+'원':'유가 미입력';
+  document.getElementById('result-card').classList.add('show');
+}
+function calcExpected(){
+  const mpg=parseFloat(document.getElementById('exp-mpg').value);
+  const dist=parseFloat(document.getElementById('exp-dist').value);
+  const price=parseFloat(document.getElementById('exp-price').value);
+  if(!mpg||!dist||!price){alert('모두 입력해주세요.');return;}
+  const liters=dist/mpg;
+  const one=liters*price;
+  const el=document.getElementById('exp-result');
+  el.style.display='grid';
+  document.getElementById('exp-liters').textContent=liters.toFixed(1)+'L';
+  document.getElementById('exp-one').textContent=fmt(one);
+  document.getElementById('exp-round').textContent=fmt(one*2);
+}
+function resetAll(){document.getElementById('result-card').classList.remove('show');}
+</script>
+</body></html>

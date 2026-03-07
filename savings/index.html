@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>예적금 이자 계산기 — CalcZip</title>
+  <meta name="description" content="예금·적금 만기 이자와 세후 수령액을 계산해보세요. 단리·복리 모두 지원." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-light:#eff4ff;--accent-dark:#1d4ed8;--green:#16a34a}
+    body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+    .header-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+    .logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}
+    .logo span{color:var(--accent)}
+    .back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
+    main{max-width:800px;margin:0 auto;padding:40px 24px 80px}
+    .page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+    h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-0.8px;margin-bottom:6px}
+    .page-sub{font-size:14px;color:var(--text-muted);font-weight:300;margin-bottom:36px}
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    @media(max-width:620px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px}
+    .card-title{font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:20px;text-transform:uppercase;letter-spacing:.5px}
+    .field{margin-bottom:20px}
+    label{display:block;font-size:13px;font-weight:500;margin-bottom:8px}
+    .hint{font-weight:300;color:var(--text-muted);font-size:12px;margin-left:4px}
+    .input-wrap{position:relative}
+    input[type=number]{width:100%;padding:10px 52px 10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:15px;color:var(--text);background:#fafaf8;outline:none;-moz-appearance:textfield;transition:border-color .15s,box-shadow .15s}
+    input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:var(--surface)}
+    .input-unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);pointer-events:none}
+    select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--text);background:#fafaf8;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+    .tab-group{display:flex;gap:8px;margin-bottom:20px}
+    .tab-btn{flex:1;padding:9px 0;border:1px solid var(--border);border-radius:8px;background:#fafaf8;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all .15s}
+    .tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .calc-btn{width:100%;margin-top:24px;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s}
+    .calc-btn:hover{background:var(--accent-dark)}
+    .calc-btn:active{transform:scale(.98)}
+    .result-card{display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .result-card.show{display:block}
+    .result-hero{background:var(--accent);padding:28px;color:#fff;text-align:center}
+    .result-hero-label{font-size:12px;opacity:.75;margin-bottom:8px;font-weight:300}
+    .result-hero-amount{font-family:'DM Mono',monospace;font-size:clamp(28px,5vw,38px);font-weight:500;letter-spacing:-1px;margin-bottom:4px}
+    .result-hero-sub{font-size:12px;opacity:.7;font-weight:300}
+    .result-body{padding:24px 28px}
+    .result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+    .result-row:last-child{border-bottom:none}
+    .result-row .r-label{color:var(--text-muted);font-weight:300}
+    .result-row .r-value{font-family:'DM Mono',monospace;font-weight:500}
+    .result-row.highlight .r-value{color:var(--green);font-size:16px}
+    .info-box{margin-top:16px;padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#92400e;font-weight:300;line-height:1.6}
+    .share-row{display:flex;gap:8px;margin-top:16px}
+    .share-btn{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:background .15s;color:var(--text-muted)}
+    .share-btn:hover{background:var(--bg);color:var(--text)}
+  </style>
+</head>
+<body>
+  <header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><a href="/" class="back-btn">← 전체 계산기</a></div></header>
+  <main>
+    <p class="page-label">Finance · Savings</p>
+    <h1>예적금 이자 계산기</h1>
+    <p class="page-sub">예금·적금 만기 이자 · 세전·세후 수령액 · 단리·복리</p>
+    <div class="layout">
+      <div class="card">
+        <div class="card-title">입력</div>
+        <div class="tab-group">
+          <button class="tab-btn active" id="tab-deposit" onclick="setType('deposit')">예금 (거치식)</button>
+          <button class="tab-btn" id="tab-saving" onclick="setType('saving')">적금 (적립식)</button>
+        </div>
+        <div class="field" id="principal-field">
+          <label>예치 금액</label>
+          <div class="input-wrap"><input type="number" id="principal" placeholder="예: 1000" /><span class="input-unit">만원</span></div>
+        </div>
+        <div class="field" id="monthly-field" style="display:none">
+          <label>월 납입금</label>
+          <div class="input-wrap"><input type="number" id="monthly" placeholder="예: 30" /><span class="input-unit">만원</span></div>
+        </div>
+        <div class="field">
+          <label>연 이자율</label>
+          <div class="input-wrap"><input type="number" id="rate" placeholder="예: 3.5" step="0.01" /><span class="input-unit">%</span></div>
+        </div>
+        <div class="field">
+          <label>기간</label>
+          <div class="input-wrap"><input type="number" id="period" placeholder="예: 12" /><span class="input-unit">개월</span></div>
+        </div>
+        <div class="field">
+          <label>이자 계산 방식</label>
+          <select id="calc-type">
+            <option value="simple">단리</option>
+            <option value="compound">복리 (월복리)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>이자 과세</label>
+          <select id="tax-type">
+            <option value="0.154">일반과세 (15.4%)</option>
+            <option value="0.099">세금우대 (9.9%)</option>
+            <option value="0">비과세 (0%)</option>
+          </select>
+        </div>
+        <button class="calc-btn" onclick="calculate()">이자 계산하기</button>
+      </div>
+      <div id="result-card" class="result-card">
+        <div class="result-hero">
+          <div class="result-hero-label">세후 만기 수령액</div>
+          <div class="result-hero-amount" id="r-after-tax">—</div>
+          <div class="result-hero-sub" id="r-sub">세전 수령액 —</div>
+        </div>
+        <div class="result-body">
+          <div class="result-row"><span class="r-label">원금 합계</span><span class="r-value" id="r-principal">—</span></div>
+          <div class="result-row"><span class="r-label">세전 이자</span><span class="r-value" id="r-interest">—</span></div>
+          <div class="result-row"><span class="r-label">이자 세금</span><span class="r-value" id="r-tax">—</span></div>
+          <div class="result-row highlight"><span class="r-label">세후 이자</span><span class="r-value" id="r-after-interest">—</span></div>
+          <div class="info-box">⚠️ 실제 금융상품의 이자는 약정 조건에 따라 다를 수 있어요. 참고용으로 활용해주세요.</div>
+          <div class="share-row"><button class="share-btn" onclick="resetAll()">↺ 다시 계산</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    let type = 'deposit';
+    function setType(t) {
+      type = t;
+      document.getElementById('tab-deposit').classList.toggle('active', t==='deposit');
+      document.getElementById('tab-saving').classList.toggle('active', t==='saving');
+      document.getElementById('principal-field').style.display = t==='deposit' ? '' : 'none';
+      document.getElementById('monthly-field').style.display = t==='saving' ? '' : 'none';
+    }
+    function fmt(n) { return Math.round(n).toLocaleString('ko-KR')+'원'; }
+    function fmtMan(n) { return (Math.round(n)/10000).toLocaleString()+'만원'; }
+    function calculate() {
+      const rate = parseFloat(document.getElementById('rate').value)/100;
+      const months = parseInt(document.getElementById('period').value);
+      const taxRate = parseFloat(document.getElementById('tax-type').value);
+      const calcType = document.getElementById('calc-type').value;
+      if (!rate || !months) { alert('이자율과 기간을 입력해주세요.'); return; }
+      let principal, interest;
+      if (type === 'deposit') {
+        principal = parseFloat(document.getElementById('principal').value)*10000 || 0;
+        if (!principal) { alert('예치 금액을 입력해주세요.'); return; }
+        if (calcType === 'simple') {
+          interest = principal * rate * (months/12);
+        } else {
+          // 월복리
+          interest = principal * (Math.pow(1 + rate/12, months) - 1);
+        }
+      } else {
+        // 적금: 매월 납입, 마지막 달은 1개월치 이자
+        const monthly = parseFloat(document.getElementById('monthly').value)*10000 || 0;
+        if (!monthly) { alert('월 납입금을 입력해주세요.'); return; }
+        principal = monthly * months;
+        if (calcType === 'simple') {
+          // 단리 적금: 각 회차별 이자 합산
+          interest = 0;
+          for (let i = 1; i <= months; i++) {
+            interest += monthly * rate * (i/12);
+          }
+        } else {
+          // 복리 적금: 각 회차 월복리로 적립
+          let total = 0;
+          const mr = rate/12;
+          for (let i = 1; i <= months; i++) {
+            total += monthly * Math.pow(1+mr, i);
+          }
+          interest = total - principal;
+        }
+      }
+      const taxAmount = interest * taxRate;
+      const afterInterest = interest - taxAmount;
+      const afterTotal = principal + afterInterest;
+      document.getElementById('r-principal').textContent = fmt(principal);
+      document.getElementById('r-interest').textContent = fmt(interest);
+      document.getElementById('r-tax').textContent = fmt(taxAmount);
+      document.getElementById('r-after-interest').textContent = fmt(afterInterest);
+      document.getElementById('r-after-tax').textContent = Math.round(afterTotal/10000).toLocaleString()+'만원';
+      document.getElementById('r-sub').textContent = '세전 수령액 '+fmt(principal+interest);
+      document.getElementById('result-card').classList.add('show');
+      setTimeout(()=>document.getElementById('result-card').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+    }
+    function resetAll() { document.getElementById('result-card').classList.remove('show'); }
+  </script>
+</body>
+</html>
