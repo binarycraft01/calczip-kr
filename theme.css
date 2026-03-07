@@ -1,0 +1,88 @@
+/* =============================================
+   CalcZip — 전역 다크모드 테마
+   theme.css
+   ============================================= */
+
+/* 라이트모드 (기본) */
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --border: #e2e0d8;
+  --text: #1a1917;
+  --text-muted: #888580;
+  --accent: #2563eb;
+  --accent-light: #eff4ff;
+  --accent-dark: #1d4ed8;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --tag-bg: #f0ede6;
+  --shadow: rgba(0, 0, 0, 0.06);
+}
+
+/* 다크모드 */
+html[data-theme="dark"] {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --border: #2a2a2a;
+  --text: #f0eeea;
+  --text-muted: #888580;
+  --accent: #3b82f6;
+  --accent-light: #1e2d4a;
+  --accent-dark: #2563eb;
+  --green: #22c55e;
+  --green-light: #0f2a1a;
+  --red: #f87171;
+  --red-light: #2a1010;
+  --tag-bg: #252525;
+  --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* 다크모드 전환 부드럽게 */
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* 다크모드에서 input 스타일 */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  color-scheme: dark;
+}
+
+/* =============================================
+   테마 토글 버튼
+   ============================================= */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.theme-toggle .toggle-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.theme-toggle .toggle-text {
+  font-size: 12px;
+}
+
+/* 다크모드일 때 버튼 텍스트/아이콘은 JS에서 처리 */

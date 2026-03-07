@@ -7,9 +7,9 @@
   <meta name="description" content="사칙연산, 퍼센트, 제곱근 등 기본 계산기." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/theme.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg: #f5f4f0; --surface: #fff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-dark: #1d4ed8; }
     body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
     .header-inner { max-width: 400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
@@ -33,12 +33,14 @@
     .btn.fn { background: #f5f4f0; color: var(--text-muted); font-size: 14px; }
     .btn.zero { grid-column: span 2; }
   </style>
+  <script src="/theme.js"></script>
 </head>
 <body>
   <header>
     <div class="header-inner">
       <a href="/" class="logo">calc<span>zip</span>.kr</a>
       <a href="/" class="back-btn">← 전체 계산기</a>
+      <button id="theme-toggle" class="theme-toggle"><span class="toggle-icon">🌙</span><span class="toggle-text">다크</span></button>
     </div>
   </header>
   <main>

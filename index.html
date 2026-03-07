@@ -6,9 +6,9 @@
   <meta name="description" content="연봉, 퇴직금, 대출, 단위변환, 세계시간 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/theme.css" />
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;--text:#1a1917;--text-muted:#888580;--accent:#2563eb;--accent-light:#eff4ff;--tag-bg:#f0ede6}
     body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
     header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
     .header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
@@ -33,9 +33,11 @@
     footer span{font-family:'DM Mono',monospace}
     @media(max-width:480px){.grid{grid-template-columns:1fr}}
   </style>
+  <script src="/theme.js"></script>
 </head>
 <body>
-  <header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><span class="header-sub">생활 계산기 모음</span></div></header>
+  <header><div class="header-inner"><a href="/" class="logo">calc<span>zip</span>.kr</a><span class="header-sub">생활 계산기 모음</span>
+      <button id="theme-toggle" class="theme-toggle"><span class="toggle-icon">🌙</span><span class="toggle-text">다크</span></button></div></header>
   <section class="hero">
     <p class="hero-label">All Calculators</p>
     <h1>필요한 계산,<br>여기서 바로.</h1>

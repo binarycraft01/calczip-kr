@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>최저시급 계산기 — CalcZip</title>
-  <meta name="description" content="2026년 최저시급 10,320원 기준으로 일급, 주급, 월급을 계산해보세요." />
+  <meta name="description" content="2024년 최저시급 9,860원 기준으로 일급, 주급, 월급을 계산해보세요." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/theme.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-light: #eff4ff; --accent-dark: #1d4ed8; }
     body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
     .header-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
@@ -52,26 +52,28 @@
     .share-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: background 0.15s; color: var(--text-muted); }
     .share-btn:hover { background: var(--bg); color: var(--text); }
   </style>
+  <script src="/theme.js"></script>
 </head>
 <body>
   <header>
     <div class="header-inner">
       <a href="/" class="logo">calc<span>zip</span>.kr</a>
       <a href="/" class="back-btn">← 전체 계산기</a>
+      <button id="theme-toggle" class="theme-toggle"><span class="toggle-icon">🌙</span><span class="toggle-text">다크</span></button>
     </div>
   </header>
   <main>
     <p class="page-label">Finance · Wage</p>
     <h1>최저시급 계산기</h1>
-    <p class="page-sub">2026년 최저시급 10,320원 기준 · 일급 · 주급 · 월급 계산</p>
+    <p class="page-sub">2024년 최저시급 9,860원 기준 · 일급 · 주급 · 월급 계산</p>
     <div class="layout">
       <div class="card">
         <div class="card-title">입력</div>
-        <div class="badge">2026 최저시급 10,320원</div>
+        <div class="badge">2024 최저시급 9,860원</div>
         <div class="field">
           <label>시급 <span style="font-size:11px;color:var(--text-muted);font-weight:300;">비워두면 최저시급 적용</span></label>
           <div class="input-wrap">
-            <input type="number" id="hourly" placeholder="10320" />
+            <input type="number" id="hourly" placeholder="9860" />
             <span class="input-unit">원</span>
           </div>
         </div>
@@ -126,7 +128,7 @@
   <script>
     function fmt(n) { return Math.round(n).toLocaleString('ko-KR') + '원'; }
     function calculate() {
-      const hourly = parseFloat(document.getElementById('hourly').value) || 10320;
+      const hourly = parseFloat(document.getElementById('hourly').value) || 9860;
       const hoursDay = parseFloat(document.getElementById('hours-day').value) || 8;
       const daysWeek = parseFloat(document.getElementById('days-week').value) || 5;
       const dailyPay = hourly * hoursDay;

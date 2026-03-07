@@ -8,23 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/theme.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #f5f4f0;
-      --surface: #ffffff;
-      --border: #e2e0d8;
-      --text: #1a1917;
-      --text-muted: #888580;
-      --accent: #2563eb;
-      --accent-light: #eff4ff;
-      --accent-dark: #1d4ed8;
-      --green: #16a34a;
-      --green-light: #f0fdf4;
-      --red: #dc2626;
-      --red-light: #fef2f2;
-    }
 
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -382,6 +368,7 @@
     }
     .share-btn:hover { background: var(--bg); color: var(--text); }
   </style>
+  <script src="/theme.js"></script>
 </head>
 <body>
 
@@ -389,6 +376,7 @@
     <div class="header-inner">
       <a href="/" class="logo">calc<span>zip</span>.kr</a>
       <a href="/" class="back-btn">← 전체 계산기</a>
+      <button id="theme-toggle" class="theme-toggle"><span class="toggle-icon">🌙</span><span class="toggle-text">다크</span></button>
     </div>
   </header>
 
