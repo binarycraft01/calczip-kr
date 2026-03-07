@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>퇴직금 계산기 — CalcZip</title>
+  <meta name="description" content="근속 기간과 평균 임금으로 퇴직금을 자동 계산해보세요. 2024년 근로기준법 기준." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8;
+      --text: #1a1917; --text-muted: #888580;
+      --accent: #2563eb; --accent-light: #eff4ff; --accent-dark: #1d4ed8;
+      --green: #16a34a;
+    }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .back-btn { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .back-btn:hover { color: var(--text); }
+    main { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -0.8px; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--text-muted); font-weight: 300; margin-bottom: 36px; }
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 620px) { .layout { grid-template-columns: 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+    .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    label .hint { font-weight: 300; color: var(--text-muted); font-size: 12px; margin-left: 4px; }
+    .input-wrap { position: relative; }
+    input[type="number"], input[type="date"] { width: 100%; padding: 10px 52px 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); background: #fafaf8; outline: none; -moz-appearance: textfield; transition: border-color 0.15s, box-shadow 0.15s; }
+    input[type="date"] { padding-right: 14px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--surface); }
+    .input-unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); pointer-events: none; }
+    .calc-btn { width: 100%; margin-top: 24px; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .calc-btn:hover { background: var(--accent-dark); }
+    .calc-btn:active { transform: scale(0.98); }
+    .result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .result-card.show { display: block; }
+    .result-hero { background: var(--accent); padding: 28px; color: #fff; text-align: center; }
+    .result-hero-label { font-size: 12px; opacity: 0.75; margin-bottom: 8px; font-weight: 300; }
+    .result-hero-amount { font-family: 'DM Mono', monospace; font-size: clamp(28px, 5vw, 38px); font-weight: 500; letter-spacing: -1px; }
+    .result-body { padding: 24px 28px; }
+    .result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .r-label { color: var(--text-muted); font-weight: 300; }
+    .result-row .r-value { font-family: 'DM Mono', monospace; font-weight: 500; }
+    .result-row.highlight .r-value { color: var(--accent); font-size: 16px; }
+    .info-box { margin-top: 16px; padding: 14px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 12px; color: #92400e; font-weight: 300; line-height: 1.6; }
+    .share-row { display: flex; gap: 8px; margin-top: 16px; }
+    .share-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: background 0.15s; color: var(--text-muted); }
+    .share-btn:hover { background: var(--bg); color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">calc<span>zip</span>.kr</a>
+      <a href="/" class="back-btn">← 전체 계산기</a>
+    </div>
+  </header>
+  <main>
+    <p class="page-label">Finance · Retirement</p>
+    <h1>퇴직금 계산기</h1>
+    <p class="page-sub">근로기준법 기준 · 1일 평균임금 × 30일 × 근속연수</p>
+    <div class="layout">
+      <div class="card">
+        <div class="card-title">입력</div>
+        <div class="field">
+          <label>입사일</label>
+          <input type="date" id="start-date" />
+        </div>
+        <div class="field">
+          <label>퇴사일</label>
+          <input type="date" id="end-date" />
+        </div>
+        <div class="field">
+          <label>최근 3개월 총 급여 <span class="hint">세전</span></label>
+          <div class="input-wrap">
+            <input type="number" id="salary-3m" placeholder="예: 1500" />
+            <span class="input-unit">만원</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>연간 상여금 <span class="hint">없으면 0</span></label>
+          <div class="input-wrap">
+            <input type="number" id="bonus" placeholder="0" />
+            <span class="input-unit">만원</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>연차수당 <span class="hint">없으면 0</span></label>
+          <div class="input-wrap">
+            <input type="number" id="annual-leave" placeholder="0" />
+            <span class="input-unit">만원</span>
+          </div>
+        </div>
+        <button class="calc-btn" onclick="calculate()">퇴직금 계산하기</button>
+      </div>
+      <div id="result-card" class="result-card">
+        <div class="result-hero">
+          <div class="result-hero-label">예상 퇴직금</div>
+          <div class="result-hero-amount" id="r-amount">—</div>
+        </div>
+        <div class="result-body">
+          <div class="result-row">
+            <span class="r-label">근속 기간</span>
+            <span class="r-value" id="r-period">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">1일 평균임금</span>
+            <span class="r-value" id="r-daily">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">30일분 평균임금</span>
+            <span class="r-value" id="r-30days">—</span>
+          </div>
+          <div class="result-row highlight">
+            <span class="r-label">퇴직금</span>
+            <span class="r-value" id="r-total">—</span>
+          </div>
+          <div class="info-box">
+            ⚠️ 퇴직금은 세전 금액이에요. 퇴직소득세가 별도로 공제될 수 있으며, 실제 금액은 회사 규정에 따라 다를 수 있어요.
+          </div>
+          <div class="share-row">
+            <button class="share-btn" onclick="resetAll()">↺ 다시 계산</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    function fmt(n) { return Math.round(n).toLocaleString('ko-KR') + '원'; }
+    function calculate() {
+      const start = new Date(document.getElementById('start-date').value);
+      const end = new Date(document.getElementById('end-date').value);
+      const salary3m = parseFloat(document.getElementById('salary-3m').value) * 10000 || 0;
+      const bonus = parseFloat(document.getElementById('bonus').value) * 10000 || 0;
+      const annualLeave = parseFloat(document.getElementById('annual-leave').value) * 10000 || 0;
+      if (!document.getElementById('start-date').value || !document.getElementById('end-date').value || !salary3m) {
+        alert('입사일, 퇴사일, 최근 3개월 급여를 입력해주세요.'); return;
+      }
+      if (end <= start) { alert('퇴사일이 입사일보다 늦어야 해요.'); return; }
+      const diffMs = end - start;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays < 365) { alert('퇴직금은 1년 이상 근무해야 발생해요.'); return; }
+      const years = diffDays / 365;
+      const yearStr = Math.floor(years) + '년 ' + Math.floor((years % 1) * 12) + '개월';
+      // 3개월 일수 계산 (근사: 91일)
+      const days3m = 91;
+      const dailyWage = (salary3m + bonus / 12 * 3 + annualLeave / 12 * 3) / days3m;
+      const thirtyDays = dailyWage * 30;
+      const retirement = thirtyDays * (diffDays / 365);
+      document.getElementById('r-period').textContent = yearStr + ' (' + diffDays + '일)';
+      document.getElementById('r-daily').textContent = fmt(dailyWage);
+      document.getElementById('r-30days').textContent = fmt(thirtyDays);
+      document.getElementById('r-total').textContent = fmt(retirement);
+      document.getElementById('r-amount').textContent = Math.round(retirement / 10000).toLocaleString() + '만원';
+      document.getElementById('result-card').classList.add('show');
+      setTimeout(() => document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+    function resetAll() {
+      document.getElementById('start-date').value = '';
+      document.getElementById('end-date').value = '';
+      document.getElementById('salary-3m').value = '';
+      document.getElementById('bonus').value = '';
+      document.getElementById('annual-leave').value = '';
+      document.getElementById('result-card').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

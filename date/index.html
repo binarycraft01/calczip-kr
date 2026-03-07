@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>날짜·D-Day 계산기 — CalcZip</title>
+  <meta name="description" content="두 날짜 사이의 기간, D-Day, 만 나이를 계산해보세요." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-light: #eff4ff; --accent-dark: #1d4ed8; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .back-btn { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .back-btn:hover { color: var(--text); }
+    main { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -0.8px; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--text-muted); font-weight: 300; margin-bottom: 36px; }
+    .tab-group { display: flex; gap: 8px; margin-bottom: 28px; }
+    .tab-btn { flex: 1; padding: 10px 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; max-width: 480px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    input[type="date"] { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--text); background: #fafaf8; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    input[type="date"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--surface); }
+    .calc-btn { width: 100%; margin-top: 8px; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .calc-btn:hover { background: var(--accent-dark); }
+    .result-box { display: none; margin-top: 20px; background: var(--accent); border-radius: 12px; padding: 24px; color: #fff; text-align: center; }
+    .result-box.show { display: block; }
+    .result-big { font-family: 'DM Mono', monospace; font-size: clamp(32px, 6vw, 48px); font-weight: 500; letter-spacing: -1px; margin-bottom: 4px; }
+    .result-sub { font-size: 13px; opacity: 0.75; font-weight: 300; }
+    .result-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .detail-box { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 12px; text-align: center; }
+    .detail-label { font-size: 11px; opacity: 0.75; margin-bottom: 4px; }
+    .detail-value { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">calc<span>zip</span>.kr</a>
+      <a href="/" class="back-btn">← 전체 계산기</a>
+    </div>
+  </header>
+  <main>
+    <p class="page-label">Life · Date</p>
+    <h1>날짜·D-Day 계산기</h1>
+    <p class="page-sub">날짜 간격 · D-Day · 만 나이 계산</p>
+    <div class="tab-group">
+      <button class="tab-btn active" onclick="switchTab('diff')">날짜 간격</button>
+      <button class="tab-btn" onclick="switchTab('dday')">D-Day</button>
+      <button class="tab-btn" onclick="switchTab('age')">만 나이</button>
+    </div>
+
+    <!-- 날짜 간격 -->
+    <div class="section active" id="sec-diff">
+      <div class="card">
+        <div class="field"><label>시작 날짜</label><input type="date" id="diff-start" /></div>
+        <div class="field"><label>끝 날짜</label><input type="date" id="diff-end" /></div>
+        <button class="calc-btn" onclick="calcDiff()">계산하기</button>
+      </div>
+      <div class="result-box" id="res-diff">
+        <div class="result-big" id="r-diff-days">—</div>
+        <div class="result-sub">일 차이</div>
+        <div class="result-details">
+          <div class="detail-box"><div class="detail-label">주</div><div class="detail-value" id="r-diff-weeks">—</div></div>
+          <div class="detail-box"><div class="detail-label">개월 (약)</div><div class="detail-value" id="r-diff-months">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- D-Day -->
+    <div class="section" id="sec-dday">
+      <div class="card">
+        <div class="field"><label>목표 날짜</label><input type="date" id="dday-target" /></div>
+        <button class="calc-btn" onclick="calcDday()">D-Day 계산하기</button>
+      </div>
+      <div class="result-box" id="res-dday">
+        <div class="result-big" id="r-dday">—</div>
+        <div class="result-sub" id="r-dday-sub">—</div>
+      </div>
+    </div>
+
+    <!-- 만 나이 -->
+    <div class="section" id="sec-age">
+      <div class="card">
+        <div class="field"><label>생년월일</label><input type="date" id="birth-date" /></div>
+        <button class="calc-btn" onclick="calcAge()">만 나이 계산하기</button>
+      </div>
+      <div class="result-box" id="res-age">
+        <div class="result-big" id="r-age">—</div>
+        <div class="result-sub">만 나이</div>
+        <div class="result-details">
+          <div class="detail-box"><div class="detail-label">한국 나이</div><div class="detail-value" id="r-korean-age">—</div></div>
+          <div class="detail-box"><div class="detail-label">다음 생일까지</div><div class="detail-value" id="r-next-bday">—</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', ['diff','dday','age'][i] === tab);
+      });
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + tab).classList.add('active');
+    }
+    function calcDiff() {
+      const s = new Date(document.getElementById('diff-start').value);
+      const e = new Date(document.getElementById('diff-end').value);
+      if (!document.getElementById('diff-start').value || !document.getElementById('diff-end').value) { alert('날짜를 입력해주세요.'); return; }
+      const diff = Math.abs(Math.floor((e - s) / (1000*60*60*24)));
+      document.getElementById('r-diff-days').textContent = diff.toLocaleString();
+      document.getElementById('r-diff-weeks').textContent = Math.floor(diff / 7) + '주';
+      document.getElementById('r-diff-months').textContent = Math.floor(diff / 30) + '개월';
+      document.getElementById('res-diff').classList.add('show');
+    }
+    function calcDday() {
+      const target = new Date(document.getElementById('dday-target').value);
+      if (!document.getElementById('dday-target').value) { alert('날짜를 입력해주세요.'); return; }
+      const today = new Date(); today.setHours(0,0,0,0);
+      const diff = Math.floor((target - today) / (1000*60*60*24));
+      if (diff === 0) {
+        document.getElementById('r-dday').textContent = 'D-Day';
+        document.getElementById('r-dday-sub').textContent = '오늘이에요! 🎉';
+      } else if (diff > 0) {
+        document.getElementById('r-dday').textContent = 'D-' + diff;
+        document.getElementById('r-dday-sub').textContent = diff + '일 남았어요';
+      } else {
+        document.getElementById('r-dday').textContent = 'D+' + Math.abs(diff);
+        document.getElementById('r-dday-sub').textContent = Math.abs(diff) + '일 지났어요';
+      }
+      document.getElementById('res-dday').classList.add('show');
+    }
+    function calcAge() {
+      const birth = new Date(document.getElementById('birth-date').value);
+      if (!document.getElementById('birth-date').value) { alert('생년월일을 입력해주세요.'); return; }
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+      const koreanAge = today.getFullYear() - birth.getFullYear() + 1;
+      const nextBday = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+      if (nextBday <= today) nextBday.setFullYear(today.getFullYear() + 1);
+      const daysToNext = Math.floor((nextBday - today) / (1000*60*60*24));
+      document.getElementById('r-age').textContent = age + '세';
+      document.getElementById('r-korean-age').textContent = koreanAge + '세';
+      document.getElementById('r-next-bday').textContent = daysToNext + '일';
+      document.getElementById('res-age').classList.add('show');
+    }
+  </script>
+</body>
+</html>

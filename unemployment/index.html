@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>실업급여 계산기 — CalcZip</title>
+  <meta name="description" content="실업급여(구직급여) 예상 수령액과 수급 기간을 계산해보세요. 2024년 기준." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-light: #eff4ff; --accent-dark: #1d4ed8; --green: #16a34a; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .back-btn { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .back-btn:hover { color: var(--text); }
+    main { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -0.8px; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--text-muted); font-weight: 300; margin-bottom: 36px; }
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 620px) { .layout { grid-template-columns: 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+    .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    label .hint { font-weight: 300; color: var(--text-muted); font-size: 12px; margin-left: 4px; }
+    .input-wrap { position: relative; }
+    input[type="number"] { width: 100%; padding: 10px 52px 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); background: #fafaf8; outline: none; -moz-appearance: textfield; transition: border-color 0.15s, box-shadow 0.15s; }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--surface); }
+    .input-unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); pointer-events: none; }
+    select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--text); background: #fafaf8; cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .calc-btn { width: 100%; margin-top: 24px; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .calc-btn:hover { background: var(--accent-dark); }
+    .calc-btn:active { transform: scale(0.98); }
+    .result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .result-card.show { display: block; }
+    .result-hero { background: var(--accent); padding: 28px; color: #fff; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .result-hero-item { text-align: center; }
+    .result-hero-label { font-size: 11px; opacity: 0.75; margin-bottom: 6px; font-weight: 300; }
+    .result-hero-value { font-family: 'DM Mono', monospace; font-size: clamp(18px, 3vw, 26px); font-weight: 500; }
+    .result-body { padding: 24px 28px; }
+    .result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .r-label { color: var(--text-muted); font-weight: 300; }
+    .result-row .r-value { font-family: 'DM Mono', monospace; font-weight: 500; }
+    .info-box { margin-top: 16px; padding: 14px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 12px; color: #92400e; font-weight: 300; line-height: 1.6; }
+    .share-row { display: flex; gap: 8px; margin-top: 16px; }
+    .share-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: background 0.15s; color: var(--text-muted); }
+    .share-btn:hover { background: var(--bg); color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">calc<span>zip</span>.kr</a>
+      <a href="/" class="back-btn">← 전체 계산기</a>
+    </div>
+  </header>
+  <main>
+    <p class="page-label">Finance · Unemployment</p>
+    <h1>실업급여 계산기</h1>
+    <p class="page-sub">2024년 기준 · 구직급여 예상 수령액 및 수급 기간</p>
+    <div class="layout">
+      <div class="card">
+        <div class="card-title">입력</div>
+        <div class="field">
+          <label>퇴직 전 3개월 평균 월급 <span class="hint">세전</span></label>
+          <div class="input-wrap">
+            <input type="number" id="avg-salary" placeholder="예: 300" />
+            <span class="input-unit">만원</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>고용보험 가입 기간</label>
+          <select id="insure-period">
+            <option value="120">1년~3년 미만 (120일)</option>
+            <option value="150">3년~5년 미만 (150일)</option>
+            <option value="180">5년~10년 미만 (180일)</option>
+            <option value="210">10년 이상 (210일)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>나이</label>
+          <select id="age-group">
+            <option value="young">50세 미만</option>
+            <option value="old">50세 이상 / 장애인</option>
+          </select>
+        </div>
+        <button class="calc-btn" onclick="calculate()">실업급여 계산하기</button>
+      </div>
+      <div id="result-card" class="result-card">
+        <div class="result-hero">
+          <div class="result-hero-item">
+            <div class="result-hero-label">1일 수령액</div>
+            <div class="result-hero-value" id="r-daily">—</div>
+          </div>
+          <div class="result-hero-item">
+            <div class="result-hero-label">총 수령액</div>
+            <div class="result-hero-value" id="r-total">—</div>
+          </div>
+        </div>
+        <div class="result-body">
+          <div class="result-row">
+            <span class="r-label">수급 기간</span>
+            <span class="r-value" id="r-period">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">1일 기준임금 (60%)</span>
+            <span class="r-value" id="r-base">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">상한액 적용</span>
+            <span class="r-value" id="r-max">1일 66,000원</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">하한액 적용</span>
+            <span class="r-value" id="r-min">최저임금 80%</span>
+          </div>
+          <div class="info-box">
+            ⚠️ 실업급여는 비자발적 퇴사, 고용보험 180일 이상 가입 등 수급 요건을 충족해야 받을 수 있어요. 본 계산은 참고용이에요.
+          </div>
+          <div class="share-row">
+            <button class="share-btn" onclick="resetAll()">↺ 다시 계산</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    function fmt(n) { return Math.round(n).toLocaleString('ko-KR') + '원'; }
+    function calculate() {
+      const avgSalary = parseFloat(document.getElementById('avg-salary').value) * 10000 || 0;
+      const period = parseInt(document.getElementById('insure-period').value);
+      if (!avgSalary) { alert('월급을 입력해주세요.'); return; }
+      const dailyWage = avgSalary / 30;
+      let dailyBenefit = dailyWage * 0.6;
+      const upperLimit = 66000;
+      const lowerLimit = 9860 * 8 * 0.8; // 2024 최저임금 9,860원 × 8시간 × 80%
+      dailyBenefit = Math.min(dailyBenefit, upperLimit);
+      dailyBenefit = Math.max(dailyBenefit, lowerLimit);
+      const total = dailyBenefit * period;
+      document.getElementById('r-daily').textContent = fmt(dailyBenefit);
+      document.getElementById('r-total').textContent = Math.round(total / 10000).toLocaleString() + '만원';
+      document.getElementById('r-period').textContent = period + '일';
+      document.getElementById('r-base').textContent = fmt(dailyWage * 0.6);
+      document.getElementById('result-card').classList.add('show');
+      setTimeout(() => document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+    function resetAll() {
+      document.getElementById('avg-salary').value = '';
+      document.getElementById('result-card').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

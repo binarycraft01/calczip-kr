@@ -4,305 +4,127 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CalcZip — 똑똑한 계산기 모음</title>
-  <meta name="description" content="연봉, 세금, 대출 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
+  <meta name="description" content="연봉, 퇴직금, 실업급여, 대출, 날짜 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #f5f4f0;
-      --surface: #ffffff;
-      --border: #e2e0d8;
-      --text: #1a1917;
-      --text-muted: #888580;
-      --accent: #2563eb;
-      --accent-light: #eff4ff;
-      --tag-bg: #f0ede6;
-    }
-
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    /* ── HEADER ── */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .header-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-    }
-    .logo {
-      font-family: 'DM Mono', monospace;
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--text);
-      text-decoration: none;
-      letter-spacing: -0.5px;
-    }
+    :root { --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-light: #eff4ff; --tag-bg: #f0ede6; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); text-decoration: none; letter-spacing: -0.5px; }
     .logo span { color: var(--accent); }
-    .header-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 300;
-    }
-
-    /* ── HERO ── */
-    .hero {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 64px 24px 40px;
-    }
-    .hero-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .hero h1 {
-      font-size: clamp(28px, 5vw, 42px);
-      font-weight: 700;
-      line-height: 1.25;
-      letter-spacing: -1px;
-      margin-bottom: 12px;
-    }
-    .hero p {
-      font-size: 15px;
-      color: var(--text-muted);
-      font-weight: 300;
-      line-height: 1.7;
-    }
-
-    /* ── FILTER TABS ── */
-    .filter-row {
-      max-width: 960px;
-      margin: 0 auto 32px;
-      padding: 0 24px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .filter-btn {
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 13px;
-      font-family: 'Noto Sans KR', sans-serif;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .filter-btn:hover, .filter-btn.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    /* ── GRID ── */
-    .grid {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
-      position: relative;
-      overflow: hidden;
-    }
-    .card:hover {
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      transform: translateY(-2px);
-      border-color: #ccc8be;
-    }
-    .card.new::after {
-      content: 'NEW';
-      position: absolute;
-      top: 14px; right: 14px;
-      font-family: 'DM Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1px;
-      background: var(--accent);
-      color: #fff;
-      padding: 2px 7px;
-      border-radius: 4px;
-    }
-    .card-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: var(--accent-light);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .card-title {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    .card-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      font-weight: 300;
-      flex: 1;
-    }
-    .card-tag {
-      display: inline-block;
-      font-size: 11px;
-      padding: 3px 9px;
-      border-radius: 4px;
-      background: var(--tag-bg);
-      color: var(--text-muted);
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* ── COMING SOON CARD ── */
-    .card.soon {
-      opacity: 0.5;
-      pointer-events: none;
-      cursor: default;
-    }
+    .header-sub { font-size: 12px; color: var(--text-muted); font-weight: 300; }
+    .hero { max-width: 960px; margin: 0 auto; padding: 64px 24px 40px; }
+    .hero-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 16px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; line-height: 1.25; letter-spacing: -1px; margin-bottom: 12px; }
+    .hero p { font-size: 15px; color: var(--text-muted); font-weight: 300; line-height: 1.7; }
+    .filter-row { max-width: 960px; margin: 0 auto 32px; padding: 0 24px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .grid { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s; position: relative; overflow: hidden; }
+    .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-2px); border-color: #ccc8be; }
+    .card-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .card-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+    .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; font-weight: 300; flex: 1; }
+    .card-tag { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 4px; background: var(--tag-bg); color: var(--text-muted); font-family: 'DM Mono', monospace; }
+    .card.soon { opacity: 0.5; pointer-events: none; cursor: default; }
     .card.soon .card-icon { background: #f0ede6; }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 24px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 300;
-    }
+    footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 300; line-height: 1.8; }
     footer span { font-family: 'DM Mono', monospace; }
-
-    @media (max-width: 480px) {
-      .grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-
   <header>
     <div class="header-inner">
       <a href="/" class="logo">calc<span>zip</span>.kr</a>
       <span class="header-sub">생활 계산기 모음</span>
     </div>
   </header>
-
   <section class="hero">
     <p class="hero-label">All Calculators</p>
     <h1>필요한 계산,<br>여기서 바로.</h1>
-    <p>연봉, 세금, 대출, 날짜 계산까지 — 복잡한 계산을 쉽고 빠르게.</p>
+    <p>연봉, 퇴직금, 실업급여, 대출, 날짜 계산까지 — 복잡한 계산을 쉽고 빠르게.</p>
   </section>
-
   <div class="filter-row">
     <button class="filter-btn active" onclick="filterCards('all', this)">전체</button>
     <button class="filter-btn" onclick="filterCards('finance', this)">금융·급여</button>
-    <button class="filter-btn" onclick="filterCards('tax', this)">세금</button>
     <button class="filter-btn" onclick="filterCards('loan', this)">대출</button>
     <button class="filter-btn" onclick="filterCards('life', this)">생활</button>
   </div>
-
   <div class="grid" id="card-grid">
-
-    <!-- ✅ 연봉 실수령액 -->
-    <a href="/salary/" class="card new" data-cat="finance">
+    <a href="/salary/" class="card" data-cat="finance">
       <div class="card-icon">💰</div>
       <div class="card-title">연봉 실수령액 계산기</div>
       <div class="card-desc">세전 연봉을 입력하면 4대보험, 소득세 공제 후 실제 수령액을 계산해드려요.</div>
       <span class="card-tag">finance</span>
     </a>
-
-    
+    <a href="/retirement/" class="card" data-cat="finance">
+      <div class="card-icon">📈</div>
+      <div class="card-title">퇴직금 계산기</div>
+      <div class="card-desc">근속 기간과 평균 임금으로 퇴직금을 자동 계산해요.</div>
+      <span class="card-tag">finance</span>
+    </a>
+    <a href="/unemployment/" class="card" data-cat="finance">
+      <div class="card-icon">🛡️</div>
+      <div class="card-title">실업급여 계산기</div>
+      <div class="card-desc">구직급여 예상 수령액과 수급 기간을 계산해요.</div>
+      <span class="card-tag">finance</span>
+    </a>
+    <a href="/minwage/" class="card" data-cat="finance">
+      <div class="card-icon">⏱️</div>
+      <div class="card-title">최저시급 계산기</div>
+      <div class="card-desc">2024년 최저시급 기준 일급, 주급, 월급을 계산해요. 주휴수당 포함.</div>
+      <span class="card-tag">finance</span>
+    </a>
     <a href="/loan/" class="card" data-cat="loan">
       <div class="card-icon">🏠</div>
       <div class="card-title">주택담보대출 계산기</div>
       <div class="card-desc">원리금균등 / 원금균등 방식으로 월 상환금과 총이자를 계산해요.</div>
       <span class="card-tag">loan</span>
     </a>
-    
-    <!-- 🔜 예정 카드들 -->
-    <div class="card soon" data-cat="tax">
-      <div class="card-icon">📊</div>
-      <div class="card-title">종합소득세 계산기</div>
-      <div class="card-desc">프리랜서·사업자를 위한 종합소득세 간편 계산기예요.</div>
-      <span class="card-tag">tax · 준비중</span>
-    </div>
-
-    <div class="card soon" data-cat="finance">
-      <div class="card-icon">📈</div>
-      <div class="card-title">퇴직금 계산기</div>
-      <div class="card-desc">근속 기간과 평균 임금으로 퇴직금을 자동 계산해요.</div>
-      <span class="card-tag">finance · 준비중</span>
-    </div>
-
-    <div class="card soon" data-cat="life">
+    <a href="/date/" class="card" data-cat="life">
       <div class="card-icon">📅</div>
       <div class="card-title">날짜·D-Day 계산기</div>
       <div class="card-desc">두 날짜 사이의 기간, D-Day, 만 나이를 계산해요.</div>
-      <span class="card-tag">life · 준비중</span>
+      <span class="card-tag">life</span>
+    </a>
+    <a href="/bmi/" class="card" data-cat="life">
+      <div class="card-icon">⚖️</div>
+      <div class="card-title">BMI 계산기</div>
+      <div class="card-desc">키와 몸무게로 체질량지수(BMI)와 비만도를 확인해요.</div>
+      <span class="card-tag">life</span>
+    </a>
+    <div class="card soon" data-cat="finance">
+      <div class="card-icon">📊</div>
+      <div class="card-title">종합소득세 계산기</div>
+      <div class="card-desc">프리랜서·사업자를 위한 종합소득세 간편 계산기예요.</div>
+      <span class="card-tag">finance · 준비중</span>
     </div>
-
     <div class="card soon" data-cat="loan">
       <div class="card-icon">💳</div>
       <div class="card-title">신용대출 계산기</div>
       <div class="card-desc">금리와 기간을 입력해 월 이자와 총 상환액을 확인해요.</div>
       <span class="card-tag">loan · 준비중</span>
     </div>
-
   </div>
-
   <footer>
-    <span>calczip.kr</span> &nbsp;·&nbsp; 생활에 필요한 계산기를 모아둔 곳
-    <br><br>
+    <span>calczip.kr</span> &nbsp;·&nbsp; 생활에 필요한 계산기를 모아둔 곳<br>
     본 사이트의 모든 계산 결과는 참고용이며, 법적 효력이 없습니다.<br>
     실제 금액은 관련 기관 및 전문가 확인을 권장합니다.
   </footer>
-
   <script>
     function filterCards(cat, btn) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.querySelectorAll('.card').forEach(card => {
-        if (cat === 'all' || card.dataset.cat === cat) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
-        }
+        card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
       });
     }
   </script>
-
 </body>
 </html>

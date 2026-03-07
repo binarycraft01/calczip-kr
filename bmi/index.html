@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMI 계산기 — CalcZip</title>
+  <meta name="description" content="키와 몸무게로 BMI(체질량지수)를 계산하고 비만도를 확인하세요." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8; --text: #1a1917; --text-muted: #888580; --accent: #2563eb; --accent-light: #eff4ff; --accent-dark: #1d4ed8; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .back-btn { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .back-btn:hover { color: var(--text); }
+    main { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+    h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -0.8px; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--text-muted); font-weight: 300; margin-bottom: 36px; }
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 620px) { .layout { grid-template-columns: 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+    .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    .input-wrap { position: relative; }
+    input[type="number"] { width: 100%; padding: 10px 52px 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); background: #fafaf8; outline: none; -moz-appearance: textfield; transition: border-color 0.15s, box-shadow 0.15s; }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--surface); }
+    .input-unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); pointer-events: none; }
+    .calc-btn { width: 100%; margin-top: 24px; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .calc-btn:hover { background: var(--accent-dark); }
+    .calc-btn:active { transform: scale(0.98); }
+    .result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .result-card.show { display: block; }
+    .result-hero { padding: 28px; color: #fff; text-align: center; background: var(--accent); }
+    .result-hero-label { font-size: 12px; opacity: 0.75; margin-bottom: 8px; font-weight: 300; }
+    .result-bmi { font-family: 'DM Mono', monospace; font-size: 56px; font-weight: 500; letter-spacing: -2px; line-height: 1; margin-bottom: 8px; }
+    .result-status { font-size: 18px; font-weight: 700; }
+    .result-body { padding: 24px 28px; }
+    .bmi-bar-wrap { margin-bottom: 20px; }
+    .bmi-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+    .bmi-bar { height: 8px; border-radius: 4px; background: linear-gradient(to right, #60a5fa, #34d399, #fbbf24, #f87171); position: relative; }
+    .bmi-marker { position: absolute; top: -4px; width: 16px; height: 16px; background: #fff; border: 2px solid var(--text); border-radius: 50%; transform: translateX(-50%); transition: left 0.5s; }
+    .result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .r-label { color: var(--text-muted); font-weight: 300; }
+    .result-row .r-value { font-family: 'DM Mono', monospace; font-weight: 500; }
+    .share-row { display: flex; gap: 8px; margin-top: 16px; }
+    .share-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: background 0.15s; color: var(--text-muted); }
+    .share-btn:hover { background: var(--bg); color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">calc<span>zip</span>.kr</a>
+      <a href="/" class="back-btn">← 전체 계산기</a>
+    </div>
+  </header>
+  <main>
+    <p class="page-label">Life · Health</p>
+    <h1>BMI 계산기</h1>
+    <p class="page-sub">체질량지수(BMI) · 비만도 확인 · 표준 체중 계산</p>
+    <div class="layout">
+      <div class="card">
+        <div class="card-title">입력</div>
+        <div class="field">
+          <label>키</label>
+          <div class="input-wrap">
+            <input type="number" id="height" placeholder="170" />
+            <span class="input-unit">cm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>몸무게</label>
+          <div class="input-wrap">
+            <input type="number" id="weight" placeholder="65" />
+            <span class="input-unit">kg</span>
+          </div>
+        </div>
+        <button class="calc-btn" onclick="calculate()">BMI 계산하기</button>
+      </div>
+      <div id="result-card" class="result-card">
+        <div class="result-hero" id="r-hero">
+          <div class="result-hero-label">BMI 지수</div>
+          <div class="result-bmi" id="r-bmi">—</div>
+          <div class="result-status" id="r-status">—</div>
+        </div>
+        <div class="result-body">
+          <div class="bmi-bar-wrap">
+            <div class="bmi-bar-label"><span>저체중 ~18.5</span><span>정상 ~23</span><span>과체중 ~25</span><span>비만 25+</span></div>
+            <div class="bmi-bar"><div class="bmi-marker" id="r-marker"></div></div>
+          </div>
+          <div class="result-row">
+            <span class="r-label">표준 체중</span>
+            <span class="r-value" id="r-std-weight">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">현재 체중과의 차이</span>
+            <span class="r-value" id="r-diff">—</span>
+          </div>
+          <div class="result-row">
+            <span class="r-label">정상 BMI 범위</span>
+            <span class="r-value">18.5 ~ 23.0</span>
+          </div>
+          <div class="share-row">
+            <button class="share-btn" onclick="resetAll()">↺ 다시 계산</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    function calculate() {
+      const h = parseFloat(document.getElementById('height').value);
+      const w = parseFloat(document.getElementById('weight').value);
+      if (!h || !w) { alert('키와 몸무게를 입력해주세요.'); return; }
+      const bmi = w / ((h / 100) ** 2);
+      let status, color;
+      if (bmi < 18.5) { status = '저체중'; color = '#60a5fa'; }
+      else if (bmi < 23) { status = '정상'; color = '#34d399'; }
+      else if (bmi < 25) { status = '과체중'; color = '#fbbf24'; }
+      else if (bmi < 30) { status = '비만'; color = '#f87171'; }
+      else { status = '고도비만'; color = '#ef4444'; }
+      // 표준 체중 (브로카 변법)
+      const stdWeight = (h - 100) * 0.9;
+      const diff = w - stdWeight;
+      document.getElementById('r-bmi').textContent = bmi.toFixed(1);
+      document.getElementById('r-status').textContent = status;
+      document.getElementById('r-hero').style.background = color;
+      document.getElementById('r-std-weight').textContent = stdWeight.toFixed(1) + 'kg';
+      document.getElementById('r-diff').textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+      // 마커 위치 (BMI 15~35 범위를 0~100%로 매핑)
+      const pct = Math.min(100, Math.max(0, (bmi - 15) / 20 * 100));
+      document.getElementById('r-marker').style.left = pct + '%';
+      document.getElementById('result-card').classList.add('show');
+      setTimeout(() => document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+    function resetAll() {
+      document.getElementById('height').value = '';
+      document.getElementById('weight').value = '';
+      document.getElementById('result-card').classList.remove('show');
+    }
+  </script>
+</body>
+</html>
