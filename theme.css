@@ -127,3 +127,21 @@ footer {
 .footer-copy a:hover {
   text-decoration: underline;
 }
+
+/* 푸터 링크 모음 */
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  margin-bottom: 16px;
+}
+.footer-links a {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color .15s;
+}
+.footer-links a:hover {
+  color: var(--accent);
+}
