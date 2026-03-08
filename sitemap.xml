@@ -24,4 +24,8 @@
   <url><loc>https://calczip.kr/discount/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://calczip.kr/gpa/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://calczip.kr/calculator/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calczip.kr/about/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://calczip.kr/privacy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://calczip.kr/terms/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://calczip.kr/cookie-policy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
