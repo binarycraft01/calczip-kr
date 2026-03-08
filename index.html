@@ -3,93 +3,164 @@
 <head>
   <script src="/head.js"></script>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>서비스 소개 — CalcZip.kr</title>
-  <meta name="description" content="CalcZip.kr은 연봉, 퇴직금, 대출, 세금 등 생활에 필요한 계산기를 무료로 제공합니다." />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="CalcZip.kr" />
-  <meta property="og:title" content="서비스 소개 — CalcZip.kr" />
-  <meta property="og:description" content="CalcZip.kr은 연봉, 퇴직금, 대출, 세금 등 생활에 필요한 계산기를 무료로 제공합니다." />
-  <meta property="og:url" content="https://calczip.kr/about/" />
-  <meta property="og:image" content="https://calczip.kr/og-image.png" />
-  <script src="/theme.js"></script>
-  <script src="/footer.js"></script>
-  <style>
+  <title>CalcZip — 똑똑한 계산기 모음</title>
+  <meta name="description" content="연봉, 퇴직금, 대출, 단위변환, 세계시간 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />  <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
     header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
-    .header-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
-    .logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none}
+    .header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+    .logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:-.5px}
     .logo span{color:var(--accent)}
-    .back-btn{font-size:13px;color:var(--text-muted);text-decoration:none}
-    main{max-width:760px;margin:0 auto;padding:56px 24px 80px}
-    .page-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
-    h1{font-size:clamp(24px,4vw,36px);font-weight:700;letter-spacing:-.8px;margin-bottom:40px}
-    .section{margin-bottom:44px}
-    .section h2{font-size:17px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
-    .section p{font-size:15px;font-weight:300;line-height:1.9;color:var(--text);margin-bottom:12px}
-    .section a{color:var(--accent);font-weight:500;text-decoration:none}
-    .section a:hover{text-decoration:underline}
-    .feature-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:16px}
-    .feature-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
-    .feature-card .icon{font-size:26px;margin-bottom:10px}
-    .feature-card .ftitle{font-size:13px;font-weight:700;margin-bottom:6px}
-    .feature-card .fdesc{font-size:12px;color:var(--text-muted);font-weight:300;line-height:1.65}
+    .header-sub{font-size:12px;color:var(--text-muted);font-weight:300}
+    .hero{max-width:960px;margin:0 auto;padding:64px 24px 40px}
+    .hero-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:16px}
+    .hero h1{font-size:clamp(28px,5vw,42px);font-weight:700;line-height:1.25;letter-spacing:-1px;margin-bottom:12px}
+    .hero p{font-size:15px;color:var(--text-muted);font-weight:300;line-height:1.7}
+
+    /* 필터 + 뷰 토글 행 */
+    .controls{max-width:960px;margin:0 auto 28px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .filter-row{display:flex;gap:8px;flex-wrap:wrap}
+    .filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text-muted);cursor:pointer;transition:all .15s}
+    .filter-btn:hover,.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+    /* 뷰 토글 버튼 */
+    .view-toggle{display:flex;gap:4px;border:1px solid var(--border);border-radius:8px;padding:3px;background:var(--surface);flex-shrink:0}
+    .view-btn{padding:5px 8px;border:none;border-radius:6px;background:none;cursor:pointer;font-size:15px;color:var(--text-muted);transition:all .15s;line-height:1}
+    .view-btn.active{background:var(--accent);color:#fff}
+    .view-btn:hover:not(.active){background:var(--border)}
+
+    /* 격자 모드 */
+    .grid{max-width:960px;margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+
+    /* 리스트 모드 */
+    .grid.list-view{grid-template-columns:1fr;gap:8px}
+    .grid.list-view .card{flex-direction:row;align-items:center;padding:16px 20px;gap:16px}
+    .grid.list-view .card-icon{flex-shrink:0;width:36px;height:36px;font-size:16px}
+    .grid.list-view .card-title{font-size:14px;margin-bottom:2px}
+    .grid.list-view .card-desc{font-size:12px;margin:0}
+    .grid.list-view .card-body{flex:1;min-width:0}
+    .grid.list-view .card-tag{margin-left:auto;flex-shrink:0}
+
+    /* 카드 공통 */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,transform .15s,border-color .15s}
+    .card:hover{box-shadow:0 4px 20px var(--shadow);transform:translateY(-2px);border-color:var(--text-muted)}
+    .grid.list-view .card:hover{transform:translateX(3px)}
+    .card-icon{width:38px;height:38px;border-radius:9px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .card-title{font-size:14px;font-weight:700;letter-spacing:-.3px}
+    .card-desc{font-size:12px;color:var(--text-muted);line-height:1.6;font-weight:300;flex:1}
+    .card-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;background:var(--tag-bg);color:var(--text-muted);font-family:'DM Mono',monospace}
+
+    /* 리스트뷰 카드 내부 레이아웃 */
+    .card-body{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+
+    @media(max-width:480px){
+      .grid{grid-template-columns:1fr}
+      .controls{gap:8px}
+    }
   </style>
+  <!-- Open Graph / 카카오톡·디스코드 링크 미리보기 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="CalcZip" />
+  <meta property="og:title" content="CalcZip — 똑똑한 계산기 모음" />
+  <meta property="og:description" content="연봉, 퇴직금, 대출, 단위변환, 세계시간 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
+  <meta property="og:url" content="https://calczip.kr/" />
+  <meta property="og:image" content="https://calczip.kr/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="ko_KR" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CalcZip — 똑똑한 계산기 모음" />
+  <meta name="twitter:description" content="연봉, 퇴직금, 대출, 단위변환, 세계시간 등 생활에 필요한 계산기를 한 곳에서. CalcZip." />
+  <meta name="twitter:image" content="https://calczip.kr/og-image.png" />
+  <script src="/theme.js"></script>
+  <script src="/footer.js"></script>
 </head>
 <body>
   <header>
     <div class="header-inner">
       <a href="/" class="logo">calc<span>zip</span>.kr</a>
-      <a href="/" class="back-btn">← 전체 계산기</a>
+      <span class="header-sub">생활 계산기 모음</span>
       <button id="theme-toggle" class="theme-toggle"><span class="toggle-icon">🌙</span><span class="toggle-text">다크</span></button>
     </div>
   </header>
-  <main>
-    <p class="page-label">About</p>
-    <h1>서비스 소개</h1>
 
-    <div class="section">
-      <h2>CalcZip.kr이란?</h2>
-      <p>CalcZip.kr은 연봉 실수령액, 퇴직금, 대출, 세금, 단위변환 등 일상에서 자주 필요한 계산기를 한 곳에 모아 무료로 제공하는 서비스예요.</p>
-      <p>복잡한 공식을 직접 찾거나 여러 사이트를 돌아다닐 필요 없이, 필요한 계산을 빠르고 간편하게 처리할 수 있도록 만들었어요.</p>
-    </div>
+  <section class="hero">
+    <p class="hero-label">All Calculators</p>
+    <h1>필요한 계산,<br>여기서 바로.</h1>
+    <p>연봉부터 단위변환, 세계시간까지 — 복잡한 계산을 쉽고 빠르게.</p>
+  </section>
 
-    <div class="section">
-      <h2>CalcZip.kr만의 특징</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="icon">🔒</div>
-          <div class="ftitle">개인정보 수집 없음</div>
-          <div class="fdesc">입력한 값은 서버로 전송되지 않아요. 모든 계산은 내 브라우저 안에서만 처리돼요.</div>
-        </div>
-        <div class="feature-card">
-          <div class="icon">💸</div>
-          <div class="ftitle">완전 무료</div>
-          <div class="fdesc">회원가입, 로그인, 결제 없이 누구나 바로 사용할 수 있어요.</div>
-        </div>
-        <div class="feature-card">
-          <div class="icon">📱</div>
-          <div class="ftitle">모바일 최적화</div>
-          <div class="fdesc">PC, 태블릿, 스마트폰 어디서든 편하게 사용할 수 있어요.</div>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🌙</div>
-          <div class="ftitle">다크모드 지원</div>
-          <div class="fdesc">눈에 편한 다크모드와 라이트모드를 자유롭게 전환할 수 있어요.</div>
-        </div>
-      </div>
+  <div class="controls">
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterCards('all',this)">전체</button>
+      <button class="filter-btn" onclick="filterCards('finance',this)">금융·급여</button>
+      <button class="filter-btn" onclick="filterCards('tax',this)">세금·대출</button>
+      <button class="filter-btn" onclick="filterCards('life',this)">생활</button>
+      <button class="filter-btn" onclick="filterCards('util',this)">유틸리티</button>
     </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-grid" onclick="setView('grid')" title="격자 보기">⊞</button>
+      <button class="view-btn" id="btn-list" onclick="setView('list')" title="리스트 보기">☰</button>
+    </div>
+  </div>
 
-    <div class="section">
-      <h2>제공하는 계산기</h2>
-      <p>금융·급여, 세금·대출, 생활, 유틸리티 4가지 카테고리의 다양한 계산기를 제공하고 있어요. 연봉 실수령액, 퇴직금, 실업급여, 종합소득세, 대출, 예적금, 단위변환, 세계시간, BMI 등 실생활에 꼭 필요한 계산기들을 지속적으로 업데이트하고 있어요.</p>
-    </div>
+  <div class="grid" id="card-grid">
+    <a href="/salary/" class="card" data-cat="finance"><div class="card-icon">💰</div><div class="card-body"><div class="card-title">연봉 실수령액 계산기</div><div class="card-desc">4대보험·소득세 공제 후 실제 월 수령액을 계산해요.</div></div><span class="card-tag">finance</span></a>
+    <a href="/retirement/" class="card" data-cat="finance"><div class="card-icon">📈</div><div class="card-body"><div class="card-title">퇴직금 계산기</div><div class="card-desc">근속 기간과 평균 임금으로 퇴직금을 자동 계산해요.</div></div><span class="card-tag">finance</span></a>
+    <a href="/unemployment/" class="card" data-cat="finance"><div class="card-icon">🛡️</div><div class="card-body"><div class="card-title">실업급여 계산기</div><div class="card-desc">구직급여 예상 수령액과 수급 기간을 계산해요.</div></div><span class="card-tag">finance</span></a>
+    <a href="/minwage/" class="card" data-cat="finance"><div class="card-icon">⏱️</div><div class="card-body"><div class="card-title">최저시급 계산기</div><div class="card-desc">2024년 최저시급 기준 일급·주급·월급. 주휴수당 포함.</div></div><span class="card-tag">finance</span></a>
+    <a href="/savings/" class="card" data-cat="finance"><div class="card-icon">🏦</div><div class="card-body"><div class="card-title">예적금 이자 계산기</div><div class="card-desc">예금·적금 만기 이자와 세후 수령액을 계산해요. 단리·복리.</div></div><span class="card-tag">finance</span></a>
+    <a href="/income-tax/" class="card" data-cat="tax"><div class="card-icon">📊</div><div class="card-body"><div class="card-title">종합소득세 계산기</div><div class="card-desc">프리랜서·사업자를 위한 종합소득세 간편 계산기예요.</div></div><span class="card-tag">tax</span></a>
+    <a href="/vat/" class="card" data-cat="tax"><div class="card-icon">🧾</div><div class="card-body"><div class="card-title">부가세 계산기</div><div class="card-desc">VAT 10% 기준 공급가액 ↔ 부가세 포함가 계산.</div></div><span class="card-tag">tax</span></a>
+    <a href="/loan/" class="card" data-cat="tax"><div class="card-icon">🏠</div><div class="card-body"><div class="card-title">주택담보대출 계산기</div><div class="card-desc">원리금균등·원금균등 방식 월 상환금·총이자·스케줄.</div></div><span class="card-tag">loan</span></a>
+    <a href="/credit-loan/" class="card" data-cat="tax"><div class="card-icon">💳</div><div class="card-body"><div class="card-title">신용대출 계산기</div><div class="card-desc">거치식·원리금균등 방식 월 이자와 총 상환액.</div></div><span class="card-tag">loan</span></a>
+    <a href="/date/" class="card" data-cat="life"><div class="card-icon">📅</div><div class="card-body"><div class="card-title">날짜·D-Day 계산기</div><div class="card-desc">날짜 간격·D-Day·만 나이를 한 곳에서 계산해요.</div></div><span class="card-tag">life</span></a>
+    <a href="/lunar/" class="card" data-cat="life"><div class="card-icon">🌙</div><div class="card-body"><div class="card-title">음력 양력 변환</div><div class="card-desc">양력 ↔ 음력 변환. 간지년·윤달 확인.</div></div><span class="card-tag">life</span></a>
+    <a href="/worldtime/" class="card" data-cat="life"><div class="card-icon">🌍</div><div class="card-body"><div class="card-title">세계 시간</div><div class="card-desc">전 세계 주요 도시 현재 시간·시간대 변환.</div></div><span class="card-tag">life</span></a>
+    <a href="/ovulation/" class="card" data-cat="life"><div class="card-icon">🌸</div><div class="card-body"><div class="card-title">배란일 계산기</div><div class="card-desc">생리 주기 기반 배란일·임신 가능 기간 계산.</div></div><span class="card-tag">life</span></a>
+    <a href="/bmi/" class="card" data-cat="life"><div class="card-icon">⚖️</div><div class="card-body"><div class="card-title">BMI 계산기</div><div class="card-desc">키와 몸무게로 체질량지수와 비만도를 확인해요.</div></div><span class="card-tag">life</span></a>
+    <a href="/calorie/" class="card" data-cat="life"><div class="card-icon">🔥</div><div class="card-body"><div class="card-title">칼로리 계산기</div><div class="card-desc">하루 권장 칼로리·다이어트·유지·벌크업 목표 칼로리.</div></div><span class="card-tag">life</span></a>
+    <a href="/pace/" class="card" data-cat="life"><div class="card-icon">🏃</div><div class="card-body"><div class="card-title">페이스 계산기</div><div class="card-desc">달리기 페이스·완주 시간·마라톤 예상 기록 계산.</div></div><span class="card-tag">life</span></a>
+    <a href="/fuel/" class="card" data-cat="life"><div class="card-icon">🚗</div><div class="card-body"><div class="card-title">자동차 연비 계산기</div><div class="card-desc">실연비·예상 연료비·목적지까지 왕복 비용 계산.</div></div><span class="card-tag">life</span></a>
+    <a href="/pyeong/" class="card" data-cat="util"><div class="card-icon">🏡</div><div class="card-body"><div class="card-title">평수 계산기</div><div class="card-desc">㎡ ↔ 평 실시간 변환. 정확한 환산 공식 사용.</div></div><span class="card-tag">util</span></a>
+    <a href="/unit/" class="card" data-cat="util"><div class="card-icon">📐</div><div class="card-body"><div class="card-title">단위 변환</div><div class="card-desc">길이·무게·온도·부피·속도·데이터·압력·시간 변환.</div></div><span class="card-tag">util</span></a>
+    <a href="/percent/" class="card" data-cat="util"><div class="card-icon">🔢</div><div class="card-body"><div class="card-title">퍼센트 계산기</div><div class="card-desc">비율·증감률·역퍼센트 4가지 계산을 실시간으로.</div></div><span class="card-tag">util</span></a>
+    <a href="/discount/" class="card" data-cat="util"><div class="card-icon">🏷️</div><div class="card-body"><div class="card-title">할인 계산기</div><div class="card-desc">할인가·할인율·중복할인·정가 역산을 계산해요.</div></div><span class="card-tag">util</span></a>
+    <a href="/gpa/" class="card" data-cat="util"><div class="card-icon">🎓</div><div class="card-body"><div class="card-title">학점 계산기</div><div class="card-desc">4.5·4.3·4.0 만점 GPA를 과목별로 계산해요.</div></div><span class="card-tag">util</span></a>
+    <a href="/calculator/" class="card" data-cat="util"><div class="card-icon">🧮</div><div class="card-body"><div class="card-title">계산기</div><div class="card-desc">사칙연산·퍼센트·부동소수점 오차 없는 기본 계산기.</div></div><span class="card-tag">util</span></a>
+  </div>
 
-    <div class="section">
-      <h2>문의</h2>
-      <p>더 나은 서비스를 위해 계속 개선하고 있어요. 오류 제보, 기능 제안, 기타 문의사항이 있으시면 언제든 연락 주세요.</p>
-      <p><a href="https://forms.gle/dzqZjzHY3sdjauj46" target="_blank" rel="noopener">→ 문의하기</a></p>
-    </div>
-  </main>
+  <script>
+    // 뷰 모드 (localStorage 유지)
+    function setView(mode) {
+      const grid = document.getElementById('card-grid');
+      const btnGrid = document.getElementById('btn-grid');
+      const btnList = document.getElementById('btn-list');
+      if (mode === 'list') {
+        grid.classList.add('list-view');
+        btnGrid.classList.remove('active');
+        btnList.classList.add('active');
+      } else {
+        grid.classList.remove('list-view');
+        btnGrid.classList.add('active');
+        btnList.classList.remove('active');
+      }
+      localStorage.setItem('calczip-view', mode);
+    }
+
+    // 카테고리 필터
+    function filterCards(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.card').forEach(card => {
+        card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+      });
+    }
+
+    // 저장된 뷰 모드 복원
+    const savedView = localStorage.getItem('calczip-view');
+    if (savedView === 'list') setView('list');
+  </script>
 </body>
 </html>
